@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class PortfolioRepository {
@@ -32,10 +33,10 @@ public class PortfolioRepository {
     }
 
     // method to get portfolio by id
-    public Portfolio getPortfolioById(Long portfolioId) {
+    public Optional<Portfolio> getPortfolioById(Long portfolioId) {
         String sql = "SELECT * FROM portfolios WHERE portfolio_id = ?";
         List<Portfolio> results = jdbcTemplate.query(sql, PORTFOLIO_ROW_MAPPER, portfolioId);
-        return results.isEmpty() ? null : results.get(0);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
     // method to add portfolio
