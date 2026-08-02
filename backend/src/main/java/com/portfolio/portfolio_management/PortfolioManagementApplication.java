@@ -1,4 +1,4 @@
-package com.example.PortfolioManagement;
+package com.portfolio.portfolio_management;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,6 @@ public class PortfolioManagementApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PortfolioManagementApplication.class, args);
-        System.out.println("Portfolio Management Application is running...");
 	}
 
 }
