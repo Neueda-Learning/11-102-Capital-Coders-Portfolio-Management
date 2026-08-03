@@ -21,7 +21,7 @@ public class PortfolioRepository {
             new Portfolio(
                     rs.getInt("portfolio_id"),
                     rs.getInt("employee_id"),
-                    rs.getInt("fund_id"),
+                    rs.getInt("investor_id"),
                     rs.getString("portfolio_name"),
                     rs.getString("description"),
                     rs.getString("risk_level"),
@@ -49,7 +49,7 @@ public class PortfolioRepository {
         String sql = """
                 INSERT INTO portfolio
                 (employee_id,
-                 fund_id,
+                 investor_id,
                  portfolio_name,
                  description,
                  risk_level,
@@ -60,8 +60,8 @@ public class PortfolioRepository {
 
         jdbcTemplate.update(
                 sql,
-                portfolio.employeeId(),
-                portfolio.fundId(),
+                portfolio.empId(),
+                portfolio.investorId(),
                 portfolio.portfolioName(),
                 portfolio.portfolioDescription(),
                 portfolio.riskLevel(),
@@ -83,7 +83,7 @@ public class PortfolioRepository {
         String sql = """
                 UPDATE portfolio
                 SET employee_id=?,
-                    fund_id=?,
+                    investor_id=?,
                     portfolio_name=?,
                     description=?,
                     risk_level=?,
@@ -94,8 +94,8 @@ public class PortfolioRepository {
 
         jdbcTemplate.update(
                 sql,
-                portfolio.employeeId(),
-                portfolio.fundId(),
+                portfolio.empId(),
+                portfolio.investorId(),
                 portfolio.portfolioName(),
                 portfolio.portfolioDescription(),
                 portfolio.riskLevel(),
@@ -127,15 +127,15 @@ public class PortfolioRepository {
         );
     }
 
-    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {
-
-        String sql =
-                "SELECT * FROM portfolio WHERE fund_id = ?";
-
-        return jdbcTemplate.query(
-                sql,
-                PORTFOLIO_ROW_MAPPER,
-                fundId
-        );
-    }
+//    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {
+//
+//        String sql =
+//                "SELECT * FROM portfolio WHERE fund_id = ?";
+//
+//        return jdbcTemplate.query(
+//                sql,
+//                PORTFOLIO_ROW_MAPPER,
+//                fundId
+//        );
+//    }
 }

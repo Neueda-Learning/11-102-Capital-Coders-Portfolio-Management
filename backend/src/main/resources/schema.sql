@@ -1,3 +1,5 @@
+USE portfolio_management;
+
 /* =====================================================
    EMPLOYEE
    Employees of Company A who manage portfolios
@@ -56,7 +58,7 @@ CREATE TABLE IF NOT EXISTS portfolio (
     portfolio_id INT PRIMARY KEY AUTO_INCREMENT,
 
     employee_id INT NOT NULL,
-    fund_id INT NOT NULL,
+    investor_id INT NOT NULL,
 
     portfolio_name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
@@ -67,8 +69,8 @@ CREATE TABLE IF NOT EXISTS portfolio (
     FOREIGN KEY (employee_id)
         REFERENCES employee(employee_id),
 
-    FOREIGN KEY (fund_id)
-        REFERENCES fund(fund_id)
+    FOREIGN KEY (investor_id)
+        REFERENCES investor(investor_id)
 );
 
 
@@ -113,4 +115,14 @@ CREATE TABLE IF NOT EXISTS investment (
 
     FOREIGN KEY (asset_id)
         REFERENCES asset(asset_id)
+);
+
+CREATE TABLE IF NOT EXISTS transaction_history (
+    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+    investment_id INT,
+    transaction_type VARCHAR(20),
+    amount DECIMAL(15,2),
+    transaction_date DATE,
+    FOREIGN KEY (investment_id)
+        REFERENCES investment(investment_id)
 );

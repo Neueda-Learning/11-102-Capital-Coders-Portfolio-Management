@@ -18,5 +18,5 @@ public interface PortfolioService {
 
     List<Portfolio> getPortfoliosByEmployeeId(Integer employeeId);
 
-    List<Portfolio> getPortfoliosByFundId(Integer fundId);
+//    List<Portfolio> getPortfoliosByFundId(Integer fundId);
 }
