@@ -32,8 +32,12 @@ public class PorfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public void addPortfolio() {
-
+    public Portfolio addPortfolio(Portfolio portfolio) {
+        Portfolio existingPortfolio = portfolioRepository.getPortfolioById(portfolio.getPortfolioId()).orElse(null);
+        if (existingPortfolio != null) {
+            throw new IllegalArgumentException("Portfolio with ID " + portfolio.getPortfolioId() + " already exists.");
+        }
+        return portfolioRepository.addPortfolio(portfolio);
     }
 
     @Override

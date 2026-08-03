@@ -11,7 +11,7 @@ public interface PortfolioService {
     // view portfolio by id
     Optional<Portfolio> viewPortfolioById(Long portfolioId);
     // add portfolio
-    void addPortfolio();
+    Portfolio addPortfolio(Portfolio portfolio);
     // update portfolio
     void updatePortfolio(Long portfolioId);
     // delete portfolio

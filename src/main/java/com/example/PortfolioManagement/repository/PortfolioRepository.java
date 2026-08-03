@@ -4,7 +4,11 @@ import com.example.PortfolioManagement.entity.Portfolio;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +44,24 @@ public class PortfolioRepository {
     }
 
     // method to add portfolio
-    public void addPortfolio(Portfolio portfolio) {
+    public Portfolio addPortfolio(Portfolio portfolio) {
         String sql = "INSERT INTO portfolios (portfolio_name, portfolio_description, risk_level) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, portfolio.getPortfolioName(), portfolio.getPortfolioDescription(), portfolio.getRiskLevel());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, portfolio.getPortfolioName());
+            ps.setString(2, portfolio.getPortfolioDescription());
+            ps.setString(3, portfolio.getRiskLevel());
+            return ps;
+        }, keyHolder);
+
+        Number generatedId = keyHolder.getKey();
+        if (generatedId != null) {
+            portfolio.setPortfolioId(generatedId.longValue());
+        }
+
+        return portfolio;
     }
 
     // method to update portfolio

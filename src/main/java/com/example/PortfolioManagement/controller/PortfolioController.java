@@ -1,12 +1,11 @@
 package com.example.PortfolioManagement.controller;
 
+import com.example.PortfolioManagement.entity.Portfolio;
 import com.example.PortfolioManagement.exception.PortfolioNotFoundException;
 import com.example.PortfolioManagement.service.PortfolioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PortfolioController {
@@ -27,6 +26,15 @@ public class PortfolioController {
             return ResponseEntity.ok(portfolioService.viewPortfolioById(id));
         } catch (PortfolioNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/portfolios")
+    public ResponseEntity<?> addPortfolio(@RequestBody Portfolio portfolio) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(portfolioService.addPortfolio(portfolio));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }
