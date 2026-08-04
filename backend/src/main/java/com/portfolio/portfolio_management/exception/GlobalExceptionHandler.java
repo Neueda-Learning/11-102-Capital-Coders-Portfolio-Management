@@ -46,4 +46,38 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+    @ExceptionHandler(InvestorNotFoundException.class)
+    public ResponseEntity<String> handleInvestorNotFoundException(
+            InvestorNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateInvestorEmailException.class)
+    public ResponseEntity<String> handleDuplicateInvestorEmailException(
+            DuplicateInvestorEmailException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<String> handleEmployeeNotFoundException(
+            EmployeeNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateEmployeeEmailException.class)
+    public ResponseEntity<String> handleDuplicateEmployeeEmailException(
+            DuplicateEmployeeEmailException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
 }
