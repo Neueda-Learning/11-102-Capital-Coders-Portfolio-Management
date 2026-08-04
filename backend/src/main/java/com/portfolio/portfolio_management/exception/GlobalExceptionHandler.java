@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+
     @ExceptionHandler(DuplicateFundException.class)
     public ResponseEntity<String> handleDuplicateFundException(
             DuplicateFundException ex) {
@@ -26,9 +27,17 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+
     @ExceptionHandler(FundNotfoundException.class)
     public ResponseEntity<String> handleFundNotFoundException(
             FundNotfoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+
     @ExceptionHandler(InvestmentNotFoundException.class)
     public ResponseEntity<String> handleInvestmentNotFound(
             InvestmentNotFoundException ex) {
