@@ -16,4 +16,13 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(InvestmentNotFoundException.class)
+    public ResponseEntity<String> handleInvestmentNotFound(
+            InvestmentNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
 }
