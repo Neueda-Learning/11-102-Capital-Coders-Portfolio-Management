@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Portfolios</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <h2>Portfolio MS</h2>
+        </div>
+
+
+        <nav>
+            <ul>
+
+                <li>
+                    <a href="dashboard.html">
+                        Dashboard
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="portfolios.html" class="active">
+                        My Portfolios
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="investors.html">
+                        Investors
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="funds.html">
+                        Funds
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="assets.html">
+                        Assets
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+
+    </aside>
+
+
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+
+
+        <!-- Header -->
+        <header class="header">
+
+            <div>
+                <h1>My Portfolios</h1>
+                <p>Manage investor portfolios</p>
+            </div>
+
+        </header>
+
+
+
+
+
+        <!-- Summary Cards -->
+        <section class="summary-cards">
+
+
+            <div class="card">
+
+                <h3>Total Portfolios</h3>
+
+                <p id="portfolioCount">
+                    0
+                </p>
+
+            </div>
+
+
+
+            <div class="card">
+
+                <h3>Total Funds Available</h3>
+
+                <p id="availableFunds">
+                    0
+                </p>
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <h3>Total Investments</h3>
+
+                <p id="investmentCount">
+                    0
+                </p>
+
+            </div>
+
+
+
+        </section>
+
+
+
+
+
+
+        <!-- Create Portfolio Form -->
+        <section class="form-section">
+
+
+            <h2>Create Portfolio</h2>
+
+
+            <form id="portfolioForm">
+
+
+                <div class="form-group">
+
+                    <label for="investor">
+                        Investor
+                    </label>
+
+
+                    <select id="investor" required>
+
+                        <option value="">
+                            Select Investor
+                        </option>
+
+                        <!-- Investors loaded from API -->
+
+                    </select>
+
+                </div>
+
+
+
+
+
+                <div class="form-group">
+
+                    <label for="portfolioName">
+                        Portfolio Name
+                    </label>
+
+
+                    <input
+                            type="text"
+                            id="portfolioName"
+                            placeholder="Enter portfolio name"
+                            required
+                    >
+
+                </div>
+
+
+
+
+
+                <button type="submit">
+                    Create Portfolio
+                </button>
+
+
+            </form>
+
+
+        </section>
+
+
+
+
+
+
+
+
+        <!-- Portfolio Table -->
+        <section class="table-section">
+
+
+            <h2>Portfolio List</h2>
+
+
+
+            <table>
+
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        Portfolio ID
+                    </th>
+
+
+                    <th>
+                        Portfolio Name
+                    </th>
+
+
+                    <th>
+                        Investor
+                    </th>
+
+
+                    <th>
+                        Total Funds
+                    </th>
+
+
+                    <th>
+                        Total Investments
+                    </th>
+
+
+                </tr>
+
+                </thead>
+
+
+
+                <tbody id="portfolioTableBody">
+
+
+                <!-- Data will be loaded using JavaScript -->
+
+
+                <tr>
+
+                    <td colspan="5">
+                        No portfolios available
+                    </td>
+
+                </tr>
+
+
+                </tbody>
+
+
+            </table>
+
+
+
+        </section>
+
+
+
+
+    </main>
+
+
+</div>
+
+
+<script src="js/config.js"></script>
+<script src="js/portfolios.js"></script>
+
+
+</body>
+
+</html>

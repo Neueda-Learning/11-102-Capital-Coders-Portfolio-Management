@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Management - Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <h2>Portfolio MS</h2>
+        </div>
+
+        <nav>
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="active">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="portfolios.html">
+                        My Portfolios
+                    </a>
+                </li>
+
+                <li>
+                    <a href="investors.html">
+                        Investors
+                    </a>
+                </li>
+
+                <li>
+                    <a href="funds.html">
+                        Funds
+                    </a>
+                </li>
+
+                <li>
+                    <a href="assets.html">
+                        Assets
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+
+        <!-- Header -->
+        <header class="header">
+
+            <div>
+                <h1>Dashboard</h1>
+                <p>Portfolio Management Overview</p>
+            </div>
+
+        </header>
+
+
+
+        <!-- Summary Cards -->
+        <section class="summary-cards">
+
+            <div class="card">
+                <h3>Total Portfolios</h3>
+                <p id="totalPortfolios">
+                    0
+                </p>
+            </div>
+
+
+            <div class="card">
+                <h3>Total Investors</h3>
+                <p id="totalInvestors">
+                    0
+                </p>
+            </div>
+
+
+            <div class="card">
+                <h3>Total Funds Received</h3>
+                <p id="totalFunds">
+                    0
+                </p>
+            </div>
+
+
+            <div class="card">
+                <h3>Total Investments</h3>
+                <p id="totalInvestments">
+                    0
+                </p>
+            </div>
+
+        </section>
+
+
+
+
+        <!-- Recent Funding Rounds -->
+        <section class="table-section">
+
+            <h2>Recent Funding Rounds</h2>
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Investor</th>
+                    <th>Portfolio</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+
+
+                <tbody id="fundingTableBody">
+
+                <!-- Data will be loaded using JavaScript -->
+
+                <tr>
+                    <td colspan="4">
+                        No funding rounds available
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+
+
+
+
+        <!-- Recent Investments -->
+        <section class="table-section">
+
+            <h2>Recent Investments</h2>
+
+            <table>
+
+                <thead>
+
+                <tr>
+                    <th>Asset</th>
+                    <th>Portfolio</th>
+                    <th>Amount Invested</th>
+                    <th>Date</th>
+                </tr>
+
+                </thead>
+
+
+                <tbody id="investmentTableBody">
+
+                <!-- Data will be loaded using JavaScript -->
+
+                <tr>
+                    <td colspan="4">
+                        No investments available
+                    </td>
+                </tr>
+
+                </tbody>
+
+
+            </table>
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+<script src="js/config.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

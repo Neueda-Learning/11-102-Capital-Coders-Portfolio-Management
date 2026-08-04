@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Assets</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-logo">
+
+            <h2>Portfolio MS</h2>
+
+        </div>
+
+
+
+        <nav>
+
+            <ul>
+
+
+                <li>
+                    <a href="dashboard.html">
+                        Dashboard
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="portfolios.html">
+                        My Portfolios
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="investors.html">
+                        Investors
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="funds.html">
+                        Funds
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="assets.html" class="active">
+                        Assets
+                    </a>
+                </li>
+
+
+            </ul>
+
+        </nav>
+
+
+    </aside>
+
+
+
+
+
+
+
+
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+
+
+        <!-- Header -->
+
+        <header class="header">
+
+
+            <div>
+
+                <h1>
+                    Assets
+                </h1>
+
+
+                <p>
+                    Manage portfolio investments
+                </p>
+
+
+            </div>
+
+
+        </header>
+
+
+
+
+
+
+
+
+
+        <!-- Summary Cards -->
+
+
+        <section class="summary-cards">
+
+
+
+            <div class="card">
+
+
+                <h3>
+                    Total Assets
+                </h3>
+
+
+                <p id="totalAssets">
+                    0
+                </p>
+
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+
+                <h3>
+                    Total Investment Amount
+                </h3>
+
+
+                <p id="totalInvestmentAmount">
+                    0
+                </p>
+
+
+            </div>
+
+
+
+
+
+            <div class="card">
+
+
+                <h3>
+                    Available Funds
+                </h3>
+
+
+                <p id="remainingFunds">
+                    0
+                </p>
+
+
+            </div>
+
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+        <!-- Create Investment Form -->
+
+
+        <section class="form-section">
+
+
+            <h2>
+                Create Investment
+            </h2>
+
+
+
+
+
+            <form id="assetForm">
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="portfolio">
+
+                        Portfolio
+
+                    </label>
+
+
+
+                    <select id="portfolio" required>
+
+
+                        <option value="">
+
+                            Select Portfolio
+
+                        </option>
+
+
+                        <!-- Portfolios loaded using API -->
+
+
+                    </select>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="assetName">
+
+                        Asset Name
+
+                    </label>
+
+
+
+                    <input
+                            type="text"
+                            id="assetName"
+                            placeholder="Enter asset name"
+                            required
+                    >
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="assetType">
+
+                        Asset Type
+
+                    </label>
+
+
+
+                    <select id="assetType" required>
+
+
+                        <option value="">
+
+                            Select Type
+
+                        </option>
+
+
+                        <option value="STOCK">
+
+                            Stock
+
+                        </option>
+
+
+                        <option value="BOND">
+
+                            Bond
+
+                        </option>
+
+
+                        <option value="STARTUP">
+
+                            Startup
+
+                        </option>
+
+
+                        <option value="OTHER">
+
+                            Other
+
+                        </option>
+
+
+
+                    </select>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="investmentAmount">
+
+                        Investment Amount
+
+                    </label>
+
+
+
+                    <input
+                            type="number"
+                            id="investmentAmount"
+                            placeholder="Enter investment amount"
+                            required
+                    >
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="investmentDate">
+
+                        Investment Date
+
+                    </label>
+
+
+
+                    <input
+                            type="date"
+                            id="investmentDate"
+                            required
+                    >
+
+
+
+                </div>
+
+
+
+
+
+
+
+                <button type="submit">
+
+                    Create Investment
+
+                </button>
+
+
+
+            </form>
+
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+        <!-- Assets Table -->
+
+
+        <section class="table-section">
+
+
+
+            <h2>
+                Investment List
+            </h2>
+
+
+
+
+
+            <table>
+
+
+                <thead>
+
+
+                <tr>
+
+
+                    <th>
+                        Investment ID
+                    </th>
+
+
+                    <th>
+                        Portfolio
+                    </th>
+
+
+                    <th>
+                        Asset Name
+                    </th>
+
+
+                    <th>
+                        Asset Type
+                    </th>
+
+
+                    <th>
+                        Amount Invested
+                    </th>
+
+
+                    <th>
+                        Date
+                    </th>
+
+
+                </tr>
+
+
+                </thead>
+
+
+
+
+
+                <tbody id="assetTableBody">
+
+
+
+                <!-- Data loaded using JavaScript -->
+
+
+                <tr>
+
+
+                    <td colspan="6">
+
+                        No investments available
+
+                    </td>
+
+
+                </tr>
+
+
+
+                </tbody>
+
+
+
+            </table>
+
+
+
+        </section>
+
+
+
+
+
+    </main>
+
+
+</div>
+
+
+
+
+
+<script src="js/config.js"></script>
+
+<script src="js/assets.js"></script>
+
+
+</body>
+
+
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Investors</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-logo">
+
+            <h2>Portfolio MS</h2>
+
+        </div>
+
+
+
+        <nav>
+
+            <ul>
+
+
+                <li>
+                    <a href="dashboard.html">
+                        Dashboard
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="portfolios.html">
+                        My Portfolios
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="investors.html" class="active">
+                        Investors
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="funds.html">
+                        Funds
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="assets.html">
+                        Assets
+                    </a>
+                </li>
+
+
+            </ul>
+
+        </nav>
+
+
+    </aside>
+
+
+
+
+
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+
+
+        <!-- Header -->
+
+        <header class="header">
+
+
+            <div>
+
+                <h1>Investors</h1>
+
+                <p>
+                    Manage investor companies providing funds
+                </p>
+
+            </div>
+
+
+        </header>
+
+
+
+
+
+
+
+
+        <!-- Summary Cards -->
+
+
+        <section class="summary-cards">
+
+
+
+            <div class="card">
+
+                <h3>
+                    Total Investors
+                </h3>
+
+                <p id="totalInvestors">
+                    0
+                </p>
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <h3>
+                    Total Funding Rounds
+                </h3>
+
+                <p id="totalFundingRounds">
+                    0
+                </p>
+
+            </div>
+
+
+
+
+            <div class="card">
+
+                <h3>
+                    Total Funds Received
+                </h3>
+
+                <p id="totalFundsReceived">
+                    0
+                </p>
+
+            </div>
+
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+
+        <!-- Add Investor Form -->
+
+
+        <section class="form-section">
+
+
+            <h2>
+                Add Investor
+            </h2>
+
+
+
+            <form id="investorForm">
+
+
+                <div class="form-group">
+
+
+                    <label for="companyName">
+                        Investor Company Name
+                    </label>
+
+
+                    <input
+                            type="text"
+                            id="companyName"
+                            placeholder="Enter investor company name"
+                            required
+                    >
+
+
+                </div>
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="contactName">
+                        Contact Person
+                    </label>
+
+
+                    <input
+                            type="text"
+                            id="contactName"
+                            placeholder="Enter contact person name"
+                    >
+
+
+                </div>
+
+
+
+
+
+                <div class="form-group">
+
+
+                    <label for="email">
+                        Email
+                    </label>
+
+
+                    <input
+                            type="email"
+                            id="email"
+                            placeholder="Enter email"
+                    >
+
+
+                </div>
+
+
+
+
+
+                <button type="submit">
+
+                    Add Investor
+
+                </button>
+
+
+
+            </form>
+
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+        <!-- Investors Table -->
+
+
+        <section class="table-section">
+
+
+            <h2>
+                Investor List
+            </h2>
+
+
+
+
+            <table>
+
+
+                <thead>
+
+
+                <tr>
+
+
+                    <th>
+                        Investor ID
+                    </th>
+
+
+                    <th>
+                        Company Name
+                    </th>
+
+
+                    <th>
+                        Portfolio
+                    </th>
+
+
+                    <th>
+                        Total Funding Rounds
+                    </th>
+
+
+                    <th>
+                        Total Funds Provided
+                    </th>
+
+
+                </tr>
+
+
+                </thead>
+
+
+
+
+
+                <tbody id="investorTableBody">
+
+
+
+                <!-- Data loaded using JavaScript -->
+
+
+                <tr>
+
+
+                    <td colspan="5">
+
+                        No investors available
+
+                    </td>
+
+
+                </tr>
+
+
+
+                </tbody>
+
+
+
+            </table>
+
+
+
+        </section>
+
+
+
+
+
+    </main>
+
+
+</div>
+
+
+
+
+
+<script src="js/config.js"></script>
+
+<script src="js/investors.js"></script>
+
+
+</body>
+
+
+</html>
