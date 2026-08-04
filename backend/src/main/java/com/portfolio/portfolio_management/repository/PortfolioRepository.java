@@ -127,6 +127,20 @@ public class PortfolioRepository {
         );
     }
 
+    public boolean existsByInvestorId(Integer investorId) {
+
+        String sql =
+                "SELECT COUNT(*) FROM portfolio WHERE investor_id = ?";
+
+        Integer count = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                investorId
+        );
+
+        return count > 0;
+    }
+
 //    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {
 //
 //        String sql =
