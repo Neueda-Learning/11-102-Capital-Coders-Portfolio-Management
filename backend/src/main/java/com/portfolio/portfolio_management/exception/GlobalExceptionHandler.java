@@ -80,4 +80,13 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(DuplicatePortfolioException.class)
+    public ResponseEntity<String> handleDuplicatePortfolio(
+            DuplicatePortfolioException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
 }

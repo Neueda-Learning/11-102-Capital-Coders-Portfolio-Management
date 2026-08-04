@@ -1,5 +1,6 @@
 package com.portfolio.portfolio_management.service;
 
+import com.portfolio.portfolio_management.exception.DuplicatePortfolioException;
 import com.portfolio.portfolio_management.exception.PortfolioNotFoundException;
 import com.portfolio.portfolio_management.model.Portfolio;
 import com.portfolio.portfolio_management.repository.PortfolioRepository;
@@ -32,6 +33,14 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public Portfolio addPortfolio(Portfolio portfolio) {
+
+        if (portfolioRepository.existsByInvestorId(portfolio.investorId())) {
+
+            throw new DuplicatePortfolioException(
+                    "Investor already has a portfolio"
+            );
+        }
+
         return portfolioRepository.addPortfolio(portfolio);
     }
 

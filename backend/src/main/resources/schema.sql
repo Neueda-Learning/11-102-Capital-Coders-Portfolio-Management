@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS portfolio (
     portfolio_id INT PRIMARY KEY AUTO_INCREMENT,
 
     employee_id INT NOT NULL,
-    investor_id INT NOT NULL,
+    investor_id INT NOT NULL UNIQUE,
 
     portfolio_name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
