@@ -29,6 +29,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FundNotfoundException.class)
     public ResponseEntity<String> handleFundNotFoundException(
             FundNotfoundException ex) {
+    @ExceptionHandler(InvestmentNotFoundException.class)
+    public ResponseEntity<String> handleInvestmentNotFound(
+            InvestmentNotFoundException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
