@@ -50,8 +50,8 @@ public class PortfolioController {
         return portfolioService.getPortfoliosByEmployeeId(employeeId);
     }
 
-    @GetMapping("/funds/{fundId}")
-    public List<Portfolio> getPortfoliosByFundId(@PathVariable Integer fundId) {
-        return portfolioService.getPortfoliosByFundId(fundId);
-    }
+//    @GetMapping("/funds/{fundId}")
+//    public List<Portfolio> getPortfoliosByFundId(@PathVariable Integer fundId) {
+//        return portfolioService.getPortfoliosByFundId(fundId);
+//    }
 }

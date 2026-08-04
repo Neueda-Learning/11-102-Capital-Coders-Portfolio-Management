@@ -62,8 +62,8 @@ public class PortfolioServiceImpl implements PortfolioService {
         return portfolioRepository.getPortfoliosByEmployeeId(employeeId);
     }
 
-    @Override
-    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {
-        return portfolioRepository.getPortfoliosByFundId(fundId);
-    }
+//    @Override
+//    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {
+//        return portfolioRepository.getPortfoliosByFundId(fundId);
+//    }
 }

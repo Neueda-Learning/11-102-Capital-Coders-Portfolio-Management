@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(PortfolioNotFoundException.class)
-    public ResponseEntity<String> handlePortfolioNotFound(
+    public ResponseEntity<String> handlePortfolioNotFoundException(
             PortfolioNotFoundException ex) {
 
         return ResponseEntity
@@ -17,6 +17,18 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+    @ExceptionHandler(DuplicateFundException.class)
+    public ResponseEntity<String> handleDuplicateFundException(
+            DuplicateFundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(FundNotfoundException.class)
+    public ResponseEntity<String> handleFundNotFoundException(
+            FundNotfoundException ex) {
     @ExceptionHandler(InvestmentNotFoundException.class)
     public ResponseEntity<String> handleInvestmentNotFound(
             InvestmentNotFoundException ex) {
