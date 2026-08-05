@@ -34,6 +34,30 @@ WHERE NOT EXISTS (
     SELECT 1 FROM investor WHERE contact_email = 'hello@summitequity.com'
 );
 
+INSERT INTO asset (asset_name, ticker_symbol, asset_type)
+SELECT 'Apple Inc.', 'AAPL', 'stocks'
+WHERE NOT EXISTS (
+    SELECT 1 FROM asset WHERE ticker_symbol = 'AAPL'
+);
+
+INSERT INTO asset (asset_name, ticker_symbol, asset_type)
+SELECT 'US Treasury 10Y', 'UST10Y', 'bonds'
+WHERE NOT EXISTS (
+    SELECT 1 FROM asset WHERE ticker_symbol = 'UST10Y'
+);
+
+INSERT INTO asset (asset_name, ticker_symbol, asset_type)
+SELECT 'Vanguard S&P 500 Index Fund', 'VFIAX', 'mutual funds'
+WHERE NOT EXISTS (
+    SELECT 1 FROM asset WHERE ticker_symbol = 'VFIAX'
+);
+
+INSERT INTO asset (asset_name, ticker_symbol, asset_type)
+SELECT 'INR Cash Reserve', 'CASH-INR', 'cash'
+WHERE NOT EXISTS (
+    SELECT 1 FROM asset WHERE ticker_symbol = 'CASH-INR'
+);
+
 INSERT INTO investor (investor_name, contact_email)
 SELECT 'Pioneer Wealth Partners', 'contact@pioneerwealth.com'
 WHERE NOT EXISTS (

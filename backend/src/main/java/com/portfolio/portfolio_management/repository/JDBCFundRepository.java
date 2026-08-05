@@ -52,6 +52,15 @@ public class JDBCFundRepository implements FundRepository {
 
     // Check duplicate fund name
     @Override
+    public List<Fund> getFundsByInvestorId(int investorId) {
+        return jdbc.query(
+                "SELECT * FROM fund WHERE investor_id = ? ORDER BY received_date DESC, fund_id DESC",
+                fundRowMapper,
+                investorId
+        );
+    }
+
+    @Override
     public Optional<Fund> getFundByName(String fundName) {
 
         List<Fund> funds = jdbc.query(
