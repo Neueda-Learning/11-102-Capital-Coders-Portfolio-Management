@@ -5,7 +5,7 @@ import com.portfolio.portfolio_management.service.PortfolioService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/portfolios")
 public class PortfolioController {
