@@ -10,6 +10,8 @@ public interface FundRepository {
 
     Optional<Fund> getFundById(int fundId);
 
+    List<Fund> getFundsByInvestorId(int investorId);
+
     Optional<Fund> getFundByName(String fundName);
 
     Fund addnewFund(Fund fund);

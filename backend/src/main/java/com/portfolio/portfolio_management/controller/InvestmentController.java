@@ -1,12 +1,15 @@
 package com.portfolio.portfolio_management.controller;
 
 import com.portfolio.portfolio_management.model.Investment;
+import com.portfolio.portfolio_management.model.InvestmentListItem;
+import com.portfolio.portfolio_management.model.InvestmentRequest;
 import com.portfolio.portfolio_management.service.InvestmentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/portfolios/{portfolioId}/investments")
 public class InvestmentController {
 
@@ -17,7 +20,7 @@ public class InvestmentController {
     }
 
     @GetMapping
-    public List<Investment> getInvestmentsByPortfolioId(@PathVariable Integer portfolioId) {
+    public List<InvestmentListItem> getInvestmentsByPortfolioId(@PathVariable Integer portfolioId) {
         return investmentService.getInvestmentsByPortfolioId(portfolioId);
     }
 
@@ -29,15 +32,15 @@ public class InvestmentController {
 
     @PostMapping
     public Investment addInvestment(@PathVariable Integer portfolioId,
-                                    @RequestBody Investment investment) {
+                                    @RequestBody InvestmentRequest investmentRequest) {
 
         Investment investmentToCreate = new Investment(
-                investment.investmentId(),
+                0,
                 portfolioId,
-                investment.assetId(),
-                investment.amountInvested(),
-                investment.currentValue(),
-                investment.purchaseDate()
+                investmentRequest.assetId(),
+                investmentRequest.amountInvested(),
+                investmentRequest.currentValue(),
+                investmentRequest.purchaseDate()
         );
 
         return investmentService.addInvestment(portfolioId, investmentToCreate);
@@ -46,15 +49,15 @@ public class InvestmentController {
     @PutMapping("/{investmentId}")
     public Investment updateInvestment(@PathVariable Integer portfolioId,
                                        @PathVariable Integer investmentId,
-                                       @RequestBody Investment investment) {
+                                       @RequestBody InvestmentRequest investmentRequest) {
 
         Investment investmentToUpdate = new Investment(
                 investmentId,
                 portfolioId,
-                investment.assetId(),
-                investment.amountInvested(),
-                investment.currentValue(),
-                investment.purchaseDate()
+                investmentRequest.assetId(),
+                investmentRequest.amountInvested(),
+                investmentRequest.currentValue(),
+                investmentRequest.purchaseDate()
         );
 
         return investmentService.updateInvestment(portfolioId, investmentId, investmentToUpdate);
@@ -68,4 +71,3 @@ public class InvestmentController {
         return "Investment deleted successfully.";
     }
 }
-

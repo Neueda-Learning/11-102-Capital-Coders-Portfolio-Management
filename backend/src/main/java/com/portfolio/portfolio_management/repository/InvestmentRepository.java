@@ -1,6 +1,7 @@
 package com.portfolio.portfolio_management.repository;
 
 import com.portfolio.portfolio_management.model.Investment;
+import com.portfolio.portfolio_management.model.InvestmentListItem;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -29,9 +30,36 @@ public class InvestmentRepository {
                             : rs.getDate("purchase_date").toLocalDate()
             );
 
-    public List<Investment> getInvestmentsByPortfolioId(Integer portfolioId) {
-        String sql = "SELECT * FROM investment WHERE portfolio_id = ?";
-        return jdbcTemplate.query(sql, INVESTMENT_ROW_MAPPER, portfolioId);
+    private final RowMapper<InvestmentListItem> INVESTMENT_LIST_ROW_MAPPER = (rs, rowNum) ->
+            new InvestmentListItem(
+                    rs.getInt("investment_id"),
+                    rs.getInt("portfolio_id"),
+                    rs.getInt("asset_id"),
+                    rs.getString("ticker_symbol"),
+                    rs.getString("asset_type"),
+                    rs.getDouble("amount_invested"),
+                    rs.getDouble("current_value"),
+                    rs.getDate("purchase_date") == null
+                            ? null
+                            : rs.getDate("purchase_date").toLocalDate()
+            );
+
+    public List<InvestmentListItem> getInvestmentsByPortfolioId(Integer portfolioId) {
+        String sql = """
+                SELECT i.investment_id,
+                       i.portfolio_id,
+                       i.asset_id,
+                       a.ticker_symbol,
+                       a.asset_type,
+                       i.amount_invested,
+                       i.current_value,
+                       i.purchase_date
+                FROM investment i
+                JOIN asset a ON a.asset_id = i.asset_id
+                WHERE i.portfolio_id = ?
+                ORDER BY i.investment_id
+                """;
+        return jdbcTemplate.query(sql, INVESTMENT_LIST_ROW_MAPPER, portfolioId);
     }
 
     public Optional<Investment> getInvestmentByIdAndPortfolioId(Integer investmentId,
@@ -102,7 +130,10 @@ public class InvestmentRepository {
     }
 
     public void deleteInvestment(Integer investmentId, Integer portfolioId) {
-        String sql = "DELETE FROM investment WHERE investment_id = ? AND portfolio_id = ?";
-        jdbcTemplate.update(sql, investmentId, portfolioId);
+        String deleteTransactionsSql = "DELETE FROM transaction_history WHERE investment_id = ?";
+        jdbcTemplate.update(deleteTransactionsSql, investmentId);
+
+        String deleteInvestmentSql = "DELETE FROM investment WHERE investment_id = ? AND portfolio_id = ?";
+        jdbcTemplate.update(deleteInvestmentSql, investmentId, portfolioId);
     }
 }

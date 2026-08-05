@@ -1,10 +1,12 @@
 package com.portfolio.portfolio_management.controller;
 
 import com.portfolio.portfolio_management.model.Portfolio;
+import com.portfolio.portfolio_management.model.PortfolioSummary;
 import com.portfolio.portfolio_management.service.PortfolioService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/portfolios")
@@ -24,6 +26,21 @@ public class PortfolioController {
     @GetMapping("/{portfolioId}")
     public Portfolio getPortfolioById(@PathVariable Integer portfolioId) {
         return portfolioService.getPortfolioById(portfolioId);
+    }
+
+    @GetMapping("/{portfolioId}/investor-id")
+    public Map<String, Integer> getInvestorIdByPortfolioId(@PathVariable Integer portfolioId) {
+        Integer investorId = portfolioService.getInvestorIdByPortfolioId(portfolioId);
+
+        return Map.of(
+                "portfolioId", portfolioId,
+                "investorId", investorId
+        );
+    }
+
+    @GetMapping("/{portfolioId}/summary")
+    public PortfolioSummary getPortfolioSummary(@PathVariable Integer portfolioId) {
+        return portfolioService.getPortfolioSummary(portfolioId);
     }
 
     @PostMapping
