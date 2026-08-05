@@ -5,7 +5,7 @@ import com.portfolio.portfolio_management.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
