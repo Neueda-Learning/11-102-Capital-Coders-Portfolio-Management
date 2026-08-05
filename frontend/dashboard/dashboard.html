@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Dashboard</title>
+    <link rel="stylesheet" href="./dashboard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">P</div>
+            <div>
+                <h1>Dashboard</h1>
+                <p>Portfolio Management</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-section="portfolios">Portfolios</button>
+            <button class="nav-item" data-section="funds">Funds</button>
+            <button class="nav-item" data-section="assets">Assets</button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="label">Employee ID</span>
+            <div id="employeeIdDisplay" class="employee-id-box">—</div>
+        </div>
+
+        <div class="employee-details">
+
+            <p>
+                <strong>Name:</strong>
+                <span id="employeeName">—</span>
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                <span id="employeeEmail">—</span>
+            </p>
+
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div>
+                <h2>Employee Portfolios</h2>
+                <p id="pageSubtitle">Showing portfolios for employee ID <span id="empIdSpan">—</span></p>
+            </div>
+
+            <div class="actions">
+                <button id="addBtn" class="action-btn primary">Add</button>
+            </div>
+        </header>
+
+        <section class="section-card">
+            <div class="section-header">
+                <h3>Portfolios</h3>
+                <span id="portfolioCount" class="muted">0 portfolios</span>
+            </div>
+            <div id="portfolioList" class="portfolio-strip"></div>
+        </section>
+
+
+        <section class="section-card">
+            <div class="section-header">
+                <h3>Static Market Snapshot</h3>
+                <span class="muted">Demo values</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>India</h4>
+                    <p>NIFTY 50: 24,850</p>
+                    <p>SENSEX: 81,200</p>
+                </div>
+                <div class="stat-card">
+                    <h4>USA</h4>
+                    <p>S&P 500: 5,480</p>
+                    <p>NASDAQ: 17,900</p>
+                </div>
+                <div class="stat-card">
+                    <h4>UK</h4>
+                    <p>FTSE 100: 8,250</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Japan</h4>
+                    <p>Nikkei 225: 39,800</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <div class="section-header">
+                <h3>Static Asset Utilization</h3>
+                <span class="muted">Demo chart</span>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-box">
+                    <div class="pie" style="--value: 45; --color: #4f46e5;"></div>
+                    <p>Stocks - 45%</p>
+                </div>
+                <div class="chart-box">
+                    <div class="pie" style="--value: 25; --color: #10b981;"></div>
+                    <p>Bonds - 25%</p>
+                </div>
+                <div class="chart-box">
+                    <div class="pie" style="--value: 20; --color: #f59e0b;"></div>
+                    <p>Mutual Funds - 20%</p>
+                </div>
+                <div class="chart-box">
+                    <div class="pie" style="--value: 10; --color: #ef4444;"></div>
+                    <p>Cash - 10%</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="section-header">
+            <h3 id="modalTitle">Add Portfolio</h3>
+            <button id="closeModalBtn" class="close-btn">×</button>
+        </div>
+
+        <form id="portfolioForm" class="form-grid">
+            <label>
+                Portfolio Name
+                <input type="text" id="portfolioName" required />
+            </label>
+            <label>
+                Description
+                <input type="text" id="portfolioDescription" required />
+            </label>
+            <label>
+                Risk Level
+                <input type="text" id="riskLevel" required />
+            </label>
+            <label>
+                Allocated Amount
+                <input type="number" id="allocatedAmount" required />
+            </label>
+            <label>
+                Investor ID
+                <input type="number" id="investorId" required />
+            </label>
+            <label>
+                Created Date
+                <input type="date" id="createdDate" required />
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="action-btn primary">Save</button>
+                <button type="button" id="cancelBtn" class="action-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="./dashboard.js"></script>
+
+</body>
+</html>
