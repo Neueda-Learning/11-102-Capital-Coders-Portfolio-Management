@@ -250,11 +250,60 @@ function renderPortfolios() {
 
             </div>
 
+            <div class="portfolio-metrics" id="metrics-${p.portfolioId}">
+                <span class="metric-loading">Loading gain/return…</span>
+            </div>
+
 
         </div>
 
         `)
         .join("");
+
+
+    // GAIN / RETURN METRICS (fetched per portfolio, doesn't block card render)
+
+    portfolios.forEach((p) => {
+
+        fetch(`${getApiBase()}/portfolios/${p.portfolioId}/summary`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Summary fetch failed");
+                return res.json();
+            })
+            .then((summary) => {
+
+                const metricsEl =
+                    document.getElementById(`metrics-${p.portfolioId}`);
+
+                if (!metricsEl) return;
+
+                const gainClass =
+                    summary.gainLoss > 0 ? "positive"
+                    : summary.gainLoss < 0 ? "negative"
+                    : "neutral";
+
+                metricsEl.innerHTML = `
+                    <span class="metric ${gainClass}">
+                        ${summary.gainLossLabel}: ${summary.gainLoss.toFixed(2)}
+                    </span>
+                    <span class="metric ${gainClass}">
+                        Return: ${summary.returnPercent.toFixed(2)}%
+                    </span>
+                `;
+
+            })
+            .catch(() => {
+
+                const metricsEl =
+                    document.getElementById(`metrics-${p.portfolioId}`);
+
+                if (metricsEl)
+                    metricsEl.innerHTML =
+                        `<span class="metric-loading">Metrics unavailable</span>`;
+
+            });
+
+    });
 
 
 
@@ -595,5 +644,116 @@ async function loadEmployeeDetails(){
 
 }
 
+// NEWS: company filter + list
+
+const newsList = document.getElementById("newsList");
+const newsCompanyFilter = document.getElementById("newsCompanyFilter");
+
+function timeAgo(publishedAt) {
+
+    if (!publishedAt) return "";
+
+    const published = new Date(publishedAt);
+    if (isNaN(published)) return "";
+
+    const diffMs = Date.now() - published.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 1) return "Just now";
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+}
+
+async function loadCompanyOptions() {
+
+    try {
+
+        const res = await fetch(`${getApiBase()}/assets`);
+
+        if (!res.ok)
+            throw new Error("Failed to fetch assets");
+
+        const assets = await res.json();
+
+        const seen = new Set();
+
+        assets.forEach((asset) => {
+
+            const name = asset.assetName;
+
+            if (!name || seen.has(name))
+                return;
+
+            seen.add(name);
+
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = `${name} (${asset.tickerSymbol || "-"})`;
+            newsCompanyFilter.appendChild(option);
+
+        });
+
+    }
+    catch (err) {
+        // company filter is optional - dashboard still works with "All markets"
+    }
+
+}
+
+async function loadNews(company = "") {
+
+    newsList.innerHTML = `<div class="details-item">Loading news…</div>`;
+
+    try {
+
+        const url = company
+            ? `${getApiBase()}/news?company=${encodeURIComponent(company)}`
+            : `${getApiBase()}/news`;
+
+        const res = await fetch(url);
+
+        if (!res.ok)
+            throw new Error("Failed to fetch news");
+
+        const articles = await res.json();
+
+        if (!articles.length) {
+            newsList.innerHTML = `<div class="details-item">No news found.</div>`;
+            return;
+        }
+
+        newsList.innerHTML = articles
+            .map((a) => `
+            <a class="news-card" href="${a.url || "#"}" target="_blank" rel="noopener noreferrer">
+                ${a.imageUrl
+                    ? `<img class="news-thumb" src="${a.imageUrl}" alt="" onerror="this.style.display='none'" />`
+                    : ""}
+                <div class="news-body">
+                    <h4>${a.title || "Untitled"}</h4>
+                    <p>${a.description || ""}</p>
+                    <span class="muted">${a.sourceName || "Unknown source"} · ${timeAgo(a.publishedAt)}</span>
+                </div>
+            </a>
+            `)
+            .join("");
+
+    }
+    catch (err) {
+
+        newsList.innerHTML =
+            `<div class="details-item">Unable to load news right now.</div>`;
+
+    }
+
+}
+
+newsCompanyFilter.addEventListener("change", () => {
+    loadNews(newsCompanyFilter.value);
+});
+
 loadPortfolios();
 loadEmployeeDetails();
+loadCompanyOptions();
+loadNews();

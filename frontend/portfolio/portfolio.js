@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:8080';
 
-const ASSET_TYPES = ['stocks', 'bonds', 'mutual funds', 'cash'];
+const ASSET_TYPES = ['stocks', 'bonds', 'mutual funds'];
 const ASSET_TYPE_LABELS = {
 	stocks: 'Stocks',
 	bonds: 'Bonds',
@@ -16,13 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	const stocksValue = document.getElementById('stocksValue');
 	const bondsValue = document.getElementById('bondsValue');
 	const mutualFundsValue = document.getElementById('mutualFundsValue');
-	const cashValue = document.getElementById('cashValue');
 	const totalFundsValue = document.getElementById('totalFundsValue');
 	const usedFundsValue = document.getElementById('usedFundsValue');
 	const availableFundsValue = document.getElementById('availableFundsValue');
 	const returnPercentValue = document.getElementById('returnPercentValue');
 	const gainLossValue = document.getElementById('gainLossValue');
 	const gainLossLabel = document.getElementById('gainLossLabel');
+
+	const totalFundsReceivedValue = document.getElementById('totalFundsReceivedValue');
+	const addFundsBtn = document.getElementById('addFundsBtn');
+	const addFundsModal = document.getElementById('addFundsModal');
+	const closeAddFundsModalBtn = document.getElementById('closeAddFundsModalBtn');
+	const cancelAddFundsBtn = document.getElementById('cancelAddFundsBtn');
+	const addFundsForm = document.getElementById('addFundsForm');
+	const fundNameInput = document.getElementById('fundNameInput');
+	const fundAmountInput = document.getElementById('fundAmountInput');
+	const fundDateInput = document.getElementById('fundDateInput');
+	const fundStatusInput = document.getElementById('fundStatusInput');
+	const addFundsMessage = document.getElementById('addFundsMessage');
+	const submitAddFundsBtn = document.getElementById('submitAddFundsBtn');
 
 	const investmentsByType = document.getElementById('investmentsByType');
 	const emptyState = document.getElementById('emptyState');
@@ -72,13 +84,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		!stocksValue ||
 		!bondsValue ||
 		!mutualFundsValue ||
-		!cashValue ||
 		!totalFundsValue ||
 		!usedFundsValue ||
 		!availableFundsValue ||
 		!returnPercentValue ||
 		!gainLossValue ||
 		!gainLossLabel ||
+		!totalFundsReceivedValue ||
+		!addFundsBtn ||
+		!addFundsModal ||
+		!closeAddFundsModalBtn ||
+		!cancelAddFundsBtn ||
+		!addFundsForm ||
+		!fundNameInput ||
+		!fundAmountInput ||
+		!fundDateInput ||
+		!fundStatusInput ||
+		!addFundsMessage ||
+		!submitAddFundsBtn ||
 		!investmentsByType ||
 		!emptyState ||
 		!viewModal ||
@@ -141,6 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	cancelTradeBtn.addEventListener('click', closeTradeModal);
 	closeTransactionsModalBtn.addEventListener('click', closeTransactionsModal);
 
+	addFundsBtn.addEventListener('click', openAddFundsModal);
+	closeAddFundsModalBtn.addEventListener('click', closeAddFundsModal);
+	cancelAddFundsBtn.addEventListener('click', closeAddFundsModal);
+
 	tradeAssetIdInput.addEventListener('change', async () => {
 		await loadCurrentMarketPriceForTrade();
 	});
@@ -170,12 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	addFundsModal.addEventListener('click', (event) => {
+		if (event.target === addFundsModal) {
+			closeAddFundsModal();
+		}
+	});
+
 	document.addEventListener('keydown', (event) => {
 		if (event.key === 'Escape') {
 			closeViewModal();
 			closeFormModal();
 			closeTradeModal();
 			closeTransactionsModal();
+			closeAddFundsModal();
 		}
 	});
 
@@ -279,6 +313,52 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	addFundsForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		clearAddFundsMessage();
+
+		const payload = {
+			fundId: 0,
+			investorId,
+			fundName: fundNameInput.value.trim(),
+			amountReceived: Number(fundAmountInput.value),
+			receivedDate: fundDateInput.value,
+			status: fundStatusInput.value
+		};
+
+		if (!payload.fundName) {
+			setAddFundsMessage('Please enter a fund name.', true);
+			return;
+		}
+
+		if (!Number.isFinite(payload.amountReceived) || payload.amountReceived <= 0) {
+			setAddFundsMessage('Please enter a valid amount.', true);
+			return;
+		}
+
+		if (!payload.receivedDate) {
+			setAddFundsMessage('Please choose a received date.', true);
+			return;
+		}
+
+		submitAddFundsBtn.disabled = true;
+
+		try {
+			await fetchJson(`${API_BASE_URL}/funds/investor/${encodeURIComponent(investorId)}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			closeAddFundsModal();
+			await Promise.all([loadInvestorFunds(), loadPortfolioSummary()]);
+		} catch (error) {
+			setAddFundsMessage(error instanceof Error ? error.message : 'Unable to add funds.', true);
+		} finally {
+			submitAddFundsBtn.disabled = false;
+		}
+	});
+
 	async function initializePage() {
 		renderInvestorLoading();
 		renderSummaryLoading();
@@ -311,9 +391,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				return;
 			}
 
+			const normalizedType = normalizeAssetType(asset.assetType ?? asset.asset_type);
+			if (normalizedType === 'cash') {
+				return;
+			}
+
 			const ticker = firstNonEmpty(asset.tickerSymbol, asset.ticker_symbol);
 			const assetName = firstNonEmpty(asset.assetName, asset.asset_name);
-			const normalizedType = normalizeAssetType(asset.assetType ?? asset.asset_type);
 			const typeLabel = normalizedType ? ASSET_TYPE_LABELS[normalizedType] : 'Unknown';
 			const optionLabel = `${ticker} - ${assetName} (${typeLabel})`;
 
@@ -346,8 +430,27 @@ document.addEventListener('DOMContentLoaded', () => {
 			investorId = investorIdPayload.investorId;
 			const investor = await fetchJson(`${API_BASE_URL}/investors/${encodeURIComponent(investorId)}`);
 			renderInvestor(investor);
+			await loadInvestorFunds();
 		} catch (error) {
 			renderInvestorError(error instanceof Error ? error.message : 'Failed to load investor details.');
+		}
+	}
+
+	async function loadInvestorFunds() {
+		if (!investorId) {
+			totalFundsReceivedValue.textContent = '-';
+			return;
+		}
+
+		totalFundsReceivedValue.textContent = 'Loading...';
+
+		try {
+			const data = await fetchJson(
+				`${API_BASE_URL}/funds/investor/${encodeURIComponent(investorId)}/total`
+			);
+			totalFundsReceivedValue.textContent = formatCurrency(Number(data.totalFundsReceived ?? 0));
+		} catch (error) {
+			totalFundsReceivedValue.textContent = '-';
 		}
 	}
 
@@ -442,8 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const grouped = {
 			stocks: [],
 			bonds: [],
-			'mutual funds': [],
-			cash: []
+			'mutual funds': []
 		};
 
 		items.forEach((item) => {
@@ -487,7 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		stocksValue.textContent = 'Loading...';
 		bondsValue.textContent = 'Loading...';
 		mutualFundsValue.textContent = 'Loading...';
-		cashValue.textContent = 'Loading...';
 		totalFundsValue.textContent = 'Loading...';
 		usedFundsValue.textContent = 'Loading...';
 		availableFundsValue.textContent = 'Loading...';
@@ -501,7 +602,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		stocksValue.textContent = formatCurrency(Number(data.stocksInvested ?? 0));
 		bondsValue.textContent = formatCurrency(Number(data.bondsInvested ?? 0));
 		mutualFundsValue.textContent = formatCurrency(Number(data.mutualFundsInvested ?? 0));
-		cashValue.textContent = formatCurrency(Number(data.cashInvested ?? 0));
 		totalFundsValue.textContent = formatCurrency(Number(data.totalFunds ?? 0));
 		usedFundsValue.textContent = formatCurrency(Number(data.usedFunds ?? 0));
 		availableFundsValue.textContent = formatCurrency(Number(data.availableFunds ?? 0));
@@ -518,7 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		stocksValue.textContent = '-';
 		bondsValue.textContent = '-';
 		mutualFundsValue.textContent = '-';
-		cashValue.textContent = '-';
 		totalFundsValue.textContent = '-';
 		usedFundsValue.textContent = '-';
 		availableFundsValue.textContent = '-';
@@ -982,6 +1081,30 @@ document.addEventListener('DOMContentLoaded', () => {
 	function setMarketPriceMessage(message, isError) {
 		formLiveMarketPrice.textContent = message;
 		formLiveMarketPrice.style.color = isError ? '#b91c1c' : '#334155';
+	}
+
+	function openAddFundsModal() {
+		addFundsForm.reset();
+		fundDateInput.max = getTodayIsoDate();
+		fundStatusInput.value = 'Completed';
+		clearAddFundsMessage();
+		addFundsModal.hidden = false;
+	}
+
+	function closeAddFundsModal() {
+		addFundsModal.hidden = true;
+		addFundsForm.reset();
+		clearAddFundsMessage();
+	}
+
+	function setAddFundsMessage(message, isError) {
+		addFundsMessage.textContent = message;
+		addFundsMessage.style.color = isError ? '#b91c1c' : '#166534';
+	}
+
+	function clearAddFundsMessage() {
+		addFundsMessage.textContent = '';
+		addFundsMessage.style.color = '#0f172a';
 	}
 
 });
