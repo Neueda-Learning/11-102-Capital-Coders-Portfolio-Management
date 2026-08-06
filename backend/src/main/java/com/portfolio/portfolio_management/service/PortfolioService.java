@@ -1,6 +1,7 @@
 package com.portfolio.portfolio_management.service;
 
 import com.portfolio.portfolio_management.model.Portfolio;
+import com.portfolio.portfolio_management.model.PortfolioPerformance;
 import com.portfolio.portfolio_management.model.PortfolioSummary;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface PortfolioService {
     Integer getInvestorIdByPortfolioId(Integer portfolioId);
 
     PortfolioSummary getPortfolioSummary(Integer portfolioId);
+
+    PortfolioPerformance getPortfolioPerformance(Integer portfolioId);
 
 //    List<Portfolio> getPortfoliosByFundId(Integer fundId);
 }

@@ -1,6 +1,7 @@
 package com.portfolio.portfolio_management.controller;
 
 import com.portfolio.portfolio_management.model.Portfolio;
+import com.portfolio.portfolio_management.model.PortfolioPerformance;
 import com.portfolio.portfolio_management.model.PortfolioSummary;
 import com.portfolio.portfolio_management.service.PortfolioService;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,11 @@ public class PortfolioController {
     @GetMapping("/{portfolioId}/summary")
     public PortfolioSummary getPortfolioSummary(@PathVariable Integer portfolioId) {
         return portfolioService.getPortfolioSummary(portfolioId);
+    }
+
+    @GetMapping("/{portfolioId}/performance")
+    public PortfolioPerformance getPortfolioPerformance(@PathVariable Integer portfolioId) {
+        return portfolioService.getPortfolioPerformance(portfolioId);
     }
 
     @PostMapping

@@ -421,6 +421,115 @@ button {
 	font-size: 0.92rem;
 }
 
+/* ===== Asset allocation pie chart ===== */
+
+.allocation-layout {
+	display: flex;
+	gap: 24px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.allocation-chart-wrap {
+	position: relative;
+	width: 220px;
+	height: 220px;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.allocation-chart-wrap canvas {
+	max-width: 220px;
+	max-height: 220px;
+}
+
+.allocation-legend {
+	flex: 1 1 260px;
+}
+
+.legend-dot {
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	margin-right: 6px;
+}
+
+/* ===== Performance section ===== */
+
+.performance-tabs {
+	display: inline-flex;
+	background: #f1f5f9;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 3px;
+	gap: 2px;
+}
+
+.tab-btn {
+	border: none;
+	background: transparent;
+	color: #475569;
+	font-weight: 600;
+	font-size: 0.85rem;
+	padding: 7px 14px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tab-btn:hover {
+	color: #1e293b;
+}
+
+.tab-btn.active {
+	background: #2563eb;
+	color: #ffffff;
+	box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.performance-sub-label {
+	margin: 2px 0 14px;
+	font-size: 0.8rem;
+	color: #64748b;
+}
+
+.performance-chart-wrap {
+	position: relative;
+	width: 100%;
+	height: 280px;
+}
+
+.performance-table {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 10px;
+	margin-top: 16px;
+}
+
+.performance-table-item {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 10px 12px;
+	text-align: center;
+}
+
+.performance-table-item .period-label {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	font-weight: 700;
+	color: #64748b;
+	margin-bottom: 4px;
+}
+
+.performance-table-item .period-value {
+	font-size: 0.85rem;
+	font-weight: 700;
+}
+
 @media (max-width: 640px) {
 	.page {
 		padding: 16px;
@@ -447,5 +556,21 @@ button {
 	.funds-panel {
 		flex-direction: column;
 		align-items: flex-start;
+	}
+
+	.allocation-layout {
+		flex-direction: column;
+	}
+
+	.performance-tabs {
+		width: 100%;
+	}
+
+	.tab-btn {
+		flex: 1;
+	}
+
+	.performance-chart-wrap {
+		height: 220px;
 	}
 }

@@ -1,12 +1,15 @@
 package com.portfolio.portfolio_management.repository;
 
+import com.portfolio.portfolio_management.model.PerformanceTransaction;
 import com.portfolio.portfolio_management.model.Portfolio;
 import com.portfolio.portfolio_management.model.PortfolioSummary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -109,25 +112,25 @@ public class PortfolioRepository {
                 .orElseThrow(() -> new RuntimeException("Portfolio not found"));
     }
 
-//    public void deletePortfolio(Integer portfolioId) {
+    //    public void deletePortfolio(Integer portfolioId) {
 //
 //        String sql = "DELETE FROM portfolio WHERE portfolio_id = ?";
 //
 //        jdbcTemplate.update(sql, portfolioId);
 //    }
-public void deletePortfolio(Integer portfolioId) {
+    public void deletePortfolio(Integer portfolioId) {
 
-    String deleteInvestmentSql =
-            "DELETE FROM investment WHERE portfolio_id = ?";
+        String deleteInvestmentSql =
+                "DELETE FROM investment WHERE portfolio_id = ?";
 
-    jdbcTemplate.update(deleteInvestmentSql, portfolioId);
+        jdbcTemplate.update(deleteInvestmentSql, portfolioId);
 
 
-    String deletePortfolioSql =
-            "DELETE FROM portfolio WHERE portfolio_id = ?";
+        String deletePortfolioSql =
+                "DELETE FROM portfolio WHERE portfolio_id = ?";
 
-    jdbcTemplate.update(deletePortfolioSql, portfolioId);
-}
+        jdbcTemplate.update(deletePortfolioSql, portfolioId);
+    }
 
     public List<Portfolio> getPortfoliosByEmployeeId(Integer employeeId) {
 
@@ -220,6 +223,65 @@ public void deletePortfolio(Integer portfolioId) {
         );
 
         return summaries.stream().findFirst();
+    }
+
+    /**
+     * All BUY/SELL transactions for every investment ever held in this
+     * portfolio, joined with the asset they belong to, ordered oldest first.
+     * Used to reconstruct performance at any point in time.
+     */
+    public List<PerformanceTransaction> getPerformanceTransactions(Integer portfolioId) {
+        String sql = """
+                SELECT i.asset_id        AS asset_id,
+                       th.transaction_type AS transaction_type,
+                       th.amount           AS amount,
+                       th.quantity         AS quantity,
+                       th.price_per_unit   AS price_per_unit,
+                       th.transaction_date AS transaction_date
+                FROM transaction_history th
+                JOIN investment i ON i.investment_id = th.investment_id
+                WHERE i.portfolio_id = ?
+                ORDER BY th.transaction_date, th.transaction_id
+                """;
+
+        return jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new PerformanceTransaction(
+                        rs.getInt("asset_id"),
+                        rs.getString("transaction_type"),
+                        rs.getDouble("amount"),
+                        rs.getDouble("quantity"),
+                        rs.getDouble("price_per_unit"),
+                        rs.getDate("transaction_date") == null
+                                ? null
+                                : rs.getDate("transaction_date").toLocalDate()
+                ),
+                portfolioId
+        );
+    }
+
+    /**
+     * Latest known price per unit for each asset currently (or previously)
+     * held in this portfolio, derived from the live-priced investment row
+     * (current_value / quantity). Assets fully sold off (quantity = 0) are
+     * absent here; the service falls back to the last transaction price.
+     */
+    public Map<Integer, Double> getCurrentPricePerAsset(Integer portfolioId) {
+        String sql = "SELECT asset_id, current_value, quantity FROM investment WHERE portfolio_id = ?";
+
+        Map<Integer, Double> priceByAsset = new HashMap<>();
+
+        jdbcTemplate.query(sql, rs -> {
+            int assetId = rs.getInt("asset_id");
+            double currentValue = rs.getDouble("current_value");
+            double quantity = rs.getDouble("quantity");
+
+            if (quantity > 0) {
+                priceByAsset.put(assetId, currentValue / quantity);
+            }
+        }, portfolioId);
+
+        return priceByAsset;
     }
 
 //    public List<Portfolio> getPortfoliosByFundId(Integer fundId) {

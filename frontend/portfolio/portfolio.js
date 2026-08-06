@@ -23,6 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	const gainLossValue = document.getElementById('gainLossValue');
 	const gainLossLabel = document.getElementById('gainLossLabel');
 
+	const allocationChartCanvas = document.getElementById('allocationChart');
+	const allocationEmptyState = document.getElementById('allocationEmptyState');
+	const availableFundsAllocationValue = document.getElementById('availableFundsAllocationValue');
+
+	const performanceTabs = document.getElementById('performanceTabs');
+	const performanceSubLabel = document.getElementById('performanceSubLabel');
+	const performanceChartCanvas = document.getElementById('performanceChart');
+	const performanceEmptyState = document.getElementById('performanceEmptyState');
+	const performanceTable = document.getElementById('performanceTable');
+
 	const totalFundsReceivedValue = document.getElementById('totalFundsReceivedValue');
 	const addFundsBtn = document.getElementById('addFundsBtn');
 	const addFundsModal = document.getElementById('addFundsModal');
@@ -137,7 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		!submitTradeBtn ||
 		!transactionsModal ||
 		!transactionsModalBody ||
-		!closeTransactionsModalBtn
+		!closeTransactionsModalBtn ||
+		!allocationChartCanvas ||
+		!allocationEmptyState ||
+		!availableFundsAllocationValue ||
+		!performanceTabs ||
+		!performanceSubLabel ||
+		!performanceChartCanvas ||
+		!performanceEmptyState ||
+		!performanceTable
 	) {
 		return;
 	}
@@ -147,6 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	let investments = [];
 	let assets = [];
 	let summary = null;
+	let performanceData = null;
+	let activePerformancePeriod = 'monthly';
+	let allocationChartInstance = null;
+	let performanceChartInstance = null;
 	const livePriceCache = new Map();
 
 	formPurchaseDateInput.max = getTodayIsoDate();
@@ -362,13 +384,37 @@ document.addEventListener('DOMContentLoaded', () => {
 	async function initializePage() {
 		renderInvestorLoading();
 		renderSummaryLoading();
+		renderPerformanceLoading();
 		await Promise.all([
 			loadAssets(),
 			loadPortfolioAndInvestor(),
 			loadPortfolioSummary(),
-			loadInvestments()
+			loadInvestments(),
+			loadPortfolioPerformance()
 		]);
 	}
+
+	performanceTabs.addEventListener('click', (event) => {
+		const target = event.target;
+		if (!(target instanceof HTMLElement) || !target.classList.contains('tab-btn')) {
+			return;
+		}
+
+		const period = target.getAttribute('data-period');
+		if (!period || period === activePerformancePeriod) {
+			return;
+		}
+
+		activePerformancePeriod = period;
+
+		performanceTabs.querySelectorAll('.tab-btn').forEach((btn) => {
+			const isActive = btn === target;
+			btn.classList.toggle('active', isActive);
+			btn.setAttribute('aria-selected', String(isActive));
+		});
+
+		renderPerformance();
+	});
 
 	async function loadAssets() {
 		try {
@@ -460,9 +506,22 @@ document.addEventListener('DOMContentLoaded', () => {
 			summary = data;
 			renderSummary(data);
 			renderInvestments();
+			renderAllocationChart(data);
 		} catch (error) {
 			summary = null;
 			renderSummaryError(error instanceof Error ? error.message : 'Failed to load portfolio summary.');
+			renderAllocationChart(null);
+		}
+	}
+
+	async function loadPortfolioPerformance() {
+		try {
+			const data = await fetchJson(`${API_BASE_URL}/portfolios/${encodeURIComponent(portfolioId)}/performance`);
+			performanceData = data;
+			renderPerformance();
+		} catch (error) {
+			performanceData = null;
+			renderPerformanceError(error instanceof Error ? error.message : 'Failed to load portfolio performance.');
 		}
 	}
 
@@ -625,6 +684,186 @@ document.addEventListener('DOMContentLoaded', () => {
 		gainLossValue.textContent = '-';
 		gainLossLabel.textContent = message;
 		setGainLossClass('Neutral');
+	}
+
+	function renderAllocationChart(data) {
+		const stocks = data ? Number(data.stocksInvested ?? 0) : 0;
+		const bonds = data ? Number(data.bondsInvested ?? 0) : 0;
+		const mutualFunds = data ? Number(data.mutualFundsInvested ?? 0) : 0;
+		const cash = data ? Number(data.cashInvested ?? 0) : 0;
+		const available = data ? Number(data.availableFunds ?? 0) : 0;
+
+		availableFundsAllocationValue.textContent = data ? formatCurrency(available) : '-';
+
+		const labels = ['Stocks', 'Bonds', 'Mutual Funds'];
+		const values = [stocks, bonds, mutualFunds];
+		const colors = ['#2563eb', '#7c3aed', '#0d9488'];
+
+		if (cash > 0) {
+			labels.push('Cash');
+			values.push(cash);
+			colors.push('#0891b2');
+		}
+
+		labels.push('Available Funds');
+		values.push(Math.max(available, 0));
+		colors.push('#f59e0b');
+
+		const hasData = values.some((value) => value > 0);
+
+		if (allocationChartInstance) {
+			allocationChartInstance.destroy();
+			allocationChartInstance = null;
+		}
+
+		if (!hasData || typeof Chart === 'undefined') {
+			allocationEmptyState.hidden = false;
+			allocationChartCanvas.hidden = true;
+			return;
+		}
+
+		allocationEmptyState.hidden = true;
+		allocationChartCanvas.hidden = false;
+
+		allocationChartInstance = new Chart(allocationChartCanvas, {
+			type: 'doughnut',
+			data: {
+				labels,
+				datasets: [{
+					data: values,
+					backgroundColor: colors,
+					borderColor: '#ffffff',
+					borderWidth: 2
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				cutout: '58%',
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						callbacks: {
+							label: (context) => `${context.label}: ${formatCurrency(context.raw)}`
+						}
+					}
+				}
+			}
+		});
+	}
+
+	function renderPerformanceLoading() {
+		performanceEmptyState.hidden = true;
+		performanceTable.innerHTML = '';
+	}
+
+	function renderPerformanceError(message) {
+		if (performanceChartInstance) {
+			performanceChartInstance.destroy();
+			performanceChartInstance = null;
+		}
+		performanceChartCanvas.hidden = true;
+		performanceEmptyState.hidden = false;
+		performanceEmptyState.textContent = message;
+		performanceTable.innerHTML = '';
+	}
+
+	const PERIOD_META = {
+		monthly: { subLabel: 'Last 6 months \u00b7 invested vs. current value' },
+		quarterly: { subLabel: 'Last 4 quarters \u00b7 invested vs. current value' },
+		yearly: { subLabel: 'Last 5 years \u00b7 invested vs. current value' }
+	};
+
+	function renderPerformance() {
+		if (!performanceData) {
+			renderPerformanceError('No performance data yet.');
+			return;
+		}
+
+		const points = performanceData[activePerformancePeriod] || [];
+		performanceSubLabel.textContent = PERIOD_META[activePerformancePeriod]?.subLabel || '';
+
+		if (points.length === 0 || typeof Chart === 'undefined') {
+			renderPerformanceError('No performance data yet.');
+			return;
+		}
+
+		performanceEmptyState.hidden = true;
+		performanceChartCanvas.hidden = false;
+
+		const labels = points.map((point) => point.label);
+		const investedSeries = points.map((point) => Number(point.invested ?? 0));
+		const currentValueSeries = points.map((point) => Number(point.currentValue ?? 0));
+
+		if (performanceChartInstance) {
+			performanceChartInstance.destroy();
+			performanceChartInstance = null;
+		}
+
+		performanceChartInstance = new Chart(performanceChartCanvas, {
+			type: 'bar',
+			data: {
+				labels,
+				datasets: [
+					{
+						label: 'Invested',
+						data: investedSeries,
+						backgroundColor: '#94a3b8',
+						borderRadius: 4,
+						maxBarThickness: 36
+					},
+					{
+						label: 'Current Value',
+						data: currentValueSeries,
+						backgroundColor: '#2563eb',
+						borderRadius: 4,
+						maxBarThickness: 36
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: { mode: 'index', intersect: false },
+				plugins: {
+					legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+					tooltip: {
+						callbacks: {
+							label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}`
+						}
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: {
+							callback: (value) => formatCurrency(value)
+						}
+					}
+				}
+			}
+		});
+
+		renderPerformanceTable(points);
+	}
+
+	function renderPerformanceTable(points) {
+		performanceTable.innerHTML = points
+			.map((point) => {
+				const gainLoss = Number(point.gainLoss ?? 0);
+				const label = gainLoss > 0 ? 'Gain' : (gainLoss < 0 ? 'Loss' : 'Neutral');
+				const cssClass = gainLossClassFor(label);
+				const sign = gainLoss > 0 ? '+' : '';
+
+				return `
+					<div class="performance-table-item">
+						<div class="period-label">${escapeHtml(point.label)}</div>
+						<div class="period-value ${cssClass}">${sign}${formatCurrency(gainLoss)}</div>
+						<div class="period-value ${cssClass}" style="font-size:0.72rem;">${sign}${formatPercent(Number(point.returnPercent ?? 0))}%</div>
+					</div>
+				`;
+			})
+			.join('');
 	}
 
 	function setGainLossClass(label) {
