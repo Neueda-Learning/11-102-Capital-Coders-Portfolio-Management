@@ -1,0 +1,63 @@
+﻿services:
+  mysql:
+    image: mysql:8.4
+    container_name: portfolio-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-portfolio_management}
+      MYSQL_USER: ${MYSQL_USER:-portfolio_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-portfolio_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    command: --default-authentication-plugin=caching_sha2_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - portfolio-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: portfolio-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-portfolio_management}?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-portfolio_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-portfolio_password}
+    ports:
+      - "8082:8082"
+    networks:
+      - portfolio-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: portfolio-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8080:80"
+    networks:
+      - portfolio-net
+
+volumes:
+  mysql_data:
+
+networks:
+  portfolio-net:
+
