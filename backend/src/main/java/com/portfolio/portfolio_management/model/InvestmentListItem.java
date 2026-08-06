@@ -10,6 +10,7 @@ public record InvestmentListItem(
         String assetType,
         double amountInvested,
         double currentValue,
+        double quantity,
         LocalDate purchaseDate
 ) {
 }

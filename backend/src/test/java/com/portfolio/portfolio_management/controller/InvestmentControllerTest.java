@@ -52,11 +52,11 @@ class InvestmentControllerTest {
     private InvestmentService investmentService;
 
     private InvestmentRequest sampleRequest() {
-        return new InvestmentRequest(3, 2500.0, 2700.0, LocalDate.of(2026, 1, 20));
+        return new InvestmentRequest(3, 2500.0, 2700.0, 0.0, LocalDate.of(2026, 1, 20));
     }
 
     private Investment sampleInvestment(int id, int portfolioId) {
-        return new Investment(id, portfolioId, 3, 2500.0, 2700.0, LocalDate.of(2026, 1, 20));
+        return new Investment(id, portfolioId, 3, 2500.0, 2700.0, 0, LocalDate.of(2026, 1, 20));
     }
 
     @Test
@@ -70,6 +70,7 @@ class InvestmentControllerTest {
                 "stocks",
                 2500.0,
                 2700.0,
+                0,
                 LocalDate.of(2026, 1, 20)
         );
         given(investmentService.getInvestmentsByPortfolioId(1)).willReturn(List.of(item));

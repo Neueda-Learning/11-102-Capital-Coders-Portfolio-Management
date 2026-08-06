@@ -120,14 +120,17 @@ h2 {
 
 .gain-positive {
 	color: #166534;
+	font-weight: 700;
 }
 
 .gain-negative {
 	color: #b91c1c;
+	font-weight: 700;
 }
 
 .gain-neutral {
 	color: #334155;
+	font-weight: 700;
 }
 
 .investments-by-type {
@@ -302,6 +305,22 @@ button {
 	justify-content: flex-end;
 	gap: 8px;
 	margin-top: 2px;
+}
+
+#tradeHoldingInfo {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 8px 10px;
+	color: #334155;
+}
+
+#transactionsModalBody p {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 8px 10px;
+	font-size: 0.92rem;
 }
 
 @media (max-width: 640px) {

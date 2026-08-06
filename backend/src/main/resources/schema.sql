@@ -108,13 +108,21 @@ CREATE TABLE IF NOT EXISTS investment (
     amount_invested DECIMAL(15,2) NOT NULL,
     current_value DECIMAL(15,2),
 
+    -- Number of units/shares held. Needed to revalue the position as the
+    -- live price moves, and to know how much can be sold.
+    quantity DECIMAL(18,6) NOT NULL DEFAULT 0,
+
     purchase_date DATE,
 
     FOREIGN KEY (portfolio_id)
         REFERENCES portfolio(portfolio_id),
 
     FOREIGN KEY (asset_id)
-        REFERENCES asset(asset_id)
+        REFERENCES asset(asset_id),
+
+    -- One investment row per (portfolio, asset): buys/sells of the same
+    -- asset in the same portfolio adjust this single row's quantity.
+    UNIQUE KEY uq_portfolio_asset (portfolio_id, asset_id)
 );
 
 CREATE TABLE IF NOT EXISTS transaction_history (
@@ -122,6 +130,8 @@ CREATE TABLE IF NOT EXISTS transaction_history (
     investment_id INT,
     transaction_type VARCHAR(20),
     amount DECIMAL(15,2),
+    quantity DECIMAL(18,6),
+    price_per_unit DECIMAL(15,4),
     transaction_date DATE,
     FOREIGN KEY (investment_id)
         REFERENCES investment(investment_id)
