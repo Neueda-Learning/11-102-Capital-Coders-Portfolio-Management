@@ -110,44 +110,22 @@ NEWS_API_CACHE_MS=${env.NEWS_API_CACHE_MS ?: '300000'}
             steps {
                 script {
                     def composeCmd = readFile(env.COMPOSE_CMD_FILE).trim()
-                    def backendPort = sh(
-                            script: """
-${composeCmd} --env-file .env port backend 8080 | tail -n 1 | sed -E 's/.*:([0-9]+)/\\1/'
-""",
-                            returnStdout: true
-                    ).trim()
-
-                    if (!backendPort) {
-                        error('Unable to resolve published backend port from docker compose.')
-                    }
-
-                    def appPort = sh(
-                            script: """
-${composeCmd} --env-file .env port frontend 80 | tail -n 1 | sed -E 's/.*:([0-9]+)/\\1/'
-""",
-                            returnStdout: true
-                    ).trim()
-
-                    if (!appPort) {
-                        error('Unable to resolve published frontend port from docker compose.')
-                    }
-
                     sh """
 for i in \$(seq 1 30); do
-  code=\$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${backendPort}/v3/api-docs" || true)
-  if [ "\$code" = "200" ]; then
-    echo "Backend health endpoint is ready (HTTP \$code)."
-    exit 0
+  if ${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://localhost:8080/v3/api-docs >/dev/null'; then
+    echo "Backend health endpoint is ready."
+    break
   fi
-  echo "Waiting for backend readiness... (\$i/30), last code=\$code"
+  if [ "\$i" = "30" ]; then
+    echo "Backend did not become ready in time."
+    exit 1
+  fi
+  echo "Waiting for backend readiness... (\$i/30)"
   sleep 5
 done
-echo "Backend did not become ready in time."
-exit 1
 """
 
-                    sh "curl -fsSL http://localhost:${appPort}/ >/dev/null"
-                    sh "curl -fsS http://localhost:${appPort}/login/login.html >/dev/null"
+                    sh "${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://frontend/login/login.html >/dev/null'"
                     sh "${composeCmd} --env-file .env ps"
                 }
             }
