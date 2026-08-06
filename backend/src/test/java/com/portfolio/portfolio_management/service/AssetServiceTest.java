@@ -21,11 +21,14 @@ class AssetServiceTest {
     @Mock
     private AssetRepository assetRepository;
 
+    @Mock
+    private MarketPriceService marketPriceService;
+
     private AssetServiceImpl assetService;
 
     @BeforeEach
     void setUp() {
-        assetService = new AssetServiceImpl(assetRepository);
+        assetService = new AssetServiceImpl(assetRepository, marketPriceService);
     }
 
     @Test
