@@ -163,26 +163,6 @@ public class JDBCFundRepository implements FundRepository {
         );
     }
 
-
-<<<<<<< Updated upstream
-=======
-    // Get all funding rounds of an investor
-//    @Override
-//    public List<Fund> getFundsByInvestorId(int investorId) {
-//
-//        return jdbc.query(
-//                """
-//                SELECT *
-//                FROM fund
-//                WHERE investor_id = ?
-//                """,
-//                fundRowMapper,
-//                investorId
-//        );
-//    }
-
-
->>>>>>> Stashed changes
     // Get total money received from an investor
     @Override
     public FundSummary getTotalFundsByInvestorId(int investorId) {
