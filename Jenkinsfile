@@ -13,6 +13,16 @@ pipeline {
         APP_PORT = '8085'
         BACKEND_PORT = '8090'
         MYSQL_PORT = '3306'
+        MYSQL_ROOT_PASSWORD = 'root123'
+        MYSQL_DATABASE = 'portfolio_management'
+        MYSQL_USER = 'portfolio_user'
+        MYSQL_PASSWORD = 'portfolio_password'
+        TWELVE_DATA_BASE_URL = 'https://api.twelvedata.com'
+        TWELVE_DATA_API_KEY = '3a004a95031a4afb87aa537765c65cf4'
+        TWELVE_DATA_CACHE_MS = '120000'
+        NEWS_API_BASE_URL = 'https://newsapi.org/v2'
+        NEWS_API_KEY = 'ec88c1cd0bb04d89981f0a25beeb03b1'
+        NEWS_API_CACHE_MS = '300000'
     }
 
     stages {

@@ -35,13 +35,23 @@ empIdSpan.textContent = empId;
 
 function getApiBase() {
     const configuredBase = window.localStorage.getItem("apiBaseUrl");
-
-    if (configuredBase && configuredBase.trim()) {
-        return configuredBase.trim().replace(/\/$/, "");
-    }
+    const normalizedConfiguredBase =
+        configuredBase && configuredBase.trim()
+            ? configuredBase.trim().replace(/\/$/, "")
+            : "";
 
     if (window.location.protocol === "file:") {
-        return "http://localhost:8090";
+        return normalizedConfiguredBase || "http://localhost:8090";
+    }
+
+    // In deployed mode, prefer the reverse-proxy path and avoid stale localhost overrides.
+    if (normalizedConfiguredBase) {
+        if (normalizedConfiguredBase.startsWith(window.location.origin)) {
+            return normalizedConfiguredBase;
+        }
+        if (normalizedConfiguredBase.startsWith("/")) {
+            return normalizedConfiguredBase.replace(/\/$/, "");
+        }
     }
 
     return `${window.location.origin}/api`;
