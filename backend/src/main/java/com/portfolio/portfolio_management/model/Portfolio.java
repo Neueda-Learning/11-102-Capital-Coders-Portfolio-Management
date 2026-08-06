@@ -3,7 +3,7 @@ package com.portfolio.portfolio_management.model;
 import java.time.LocalDate;
 
 public record Portfolio(
-        int portfolioId,
+        Integer portfolioId,
         int empId,
         int investorId,
         String portfolioName,

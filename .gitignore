@@ -1,6 +1,5 @@
 .idea/
 **/target/
 *.iml
-application.properties
 .env
 .compose_cmd

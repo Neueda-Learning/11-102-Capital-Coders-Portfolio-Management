@@ -461,6 +461,8 @@ async(e)=>{
 
     const payload = {
 
+        portfolioId: formMode === "add" ? 0 : (selectedPortfolio?.portfolioId ?? 0),
+
         empId:Number(empId),
 
         investorId:Number(
