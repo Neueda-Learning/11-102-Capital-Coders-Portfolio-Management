@@ -163,7 +163,6 @@ public class JDBCFundRepository implements FundRepository {
         );
     }
 
-
     // Get total money received from an investor
     @Override
     public FundSummary getTotalFundsByInvestorId(int investorId) {

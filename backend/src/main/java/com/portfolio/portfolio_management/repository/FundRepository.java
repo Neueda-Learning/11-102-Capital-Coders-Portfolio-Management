@@ -20,7 +20,6 @@ public interface FundRepository {
 
     void deleteFund(int fundId);
 
-
     // Gives only total amount received by investor
     FundSummary getTotalFundsByInvestorId(int investorId);
 }

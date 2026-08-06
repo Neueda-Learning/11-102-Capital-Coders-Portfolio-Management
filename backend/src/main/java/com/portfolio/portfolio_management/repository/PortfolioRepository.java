@@ -109,12 +109,25 @@ public class PortfolioRepository {
                 .orElseThrow(() -> new RuntimeException("Portfolio not found"));
     }
 
-    public void deletePortfolio(Integer portfolioId) {
+//    public void deletePortfolio(Integer portfolioId) {
+//
+//        String sql = "DELETE FROM portfolio WHERE portfolio_id = ?";
+//
+//        jdbcTemplate.update(sql, portfolioId);
+//    }
+public void deletePortfolio(Integer portfolioId) {
 
-        String sql = "DELETE FROM portfolio WHERE portfolio_id = ?";
+    String deleteInvestmentSql =
+            "DELETE FROM investment WHERE portfolio_id = ?";
 
-        jdbcTemplate.update(sql, portfolioId);
-    }
+    jdbcTemplate.update(deleteInvestmentSql, portfolioId);
+
+
+    String deletePortfolioSql =
+            "DELETE FROM portfolio WHERE portfolio_id = ?";
+
+    jdbcTemplate.update(deletePortfolioSql, portfolioId);
+}
 
     public List<Portfolio> getPortfoliosByEmployeeId(Integer employeeId) {
 

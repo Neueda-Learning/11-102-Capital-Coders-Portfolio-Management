@@ -16,7 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const nextPage = `../dashboard/dashboard.html?employeeId=${encodeURIComponent(employeeId)}`;
-        window.location.href = nextPage;
+//        const nextPage = `../dashboard/dashboard.html?employeeId=${encodeURIComponent(employeeId)}`;
+//        window.location.href = nextPage;
+     localStorage.setItem("empId", employeeId);
+
+     const nextPage =
+     `../dashboard/dashboard.html?employeeId=${encodeURIComponent(employeeId)}`;
+
+     window.location.href = nextPage;
     });
 });
