@@ -20,8 +20,6 @@ public interface FundRepository {
 
     void deleteFund(int fundId);
 
-    // Optional: gives complete funding history of an investor
-    List<Fund> getFundsByInvestorId(int investorId);
 
     // Gives only total amount received by investor
     FundSummary getTotalFundsByInvestorId(int investorId);
