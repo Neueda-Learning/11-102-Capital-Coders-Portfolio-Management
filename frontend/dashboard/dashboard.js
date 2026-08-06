@@ -34,7 +34,17 @@ empIdSpan.textContent = empId;
 
 
 function getApiBase() {
-    return "http://localhost:8080";
+    const configuredBase = window.localStorage.getItem("apiBaseUrl");
+
+    if (configuredBase && configuredBase.trim()) {
+        return configuredBase.trim().replace(/\/$/, "");
+    }
+
+    if (window.location.protocol === "file:") {
+        return "http://localhost:8080";
+    }
+
+    return `${window.location.origin}/api`;
 }
 
 function showToast(message, type) {

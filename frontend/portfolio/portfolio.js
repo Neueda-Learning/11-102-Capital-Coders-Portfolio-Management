@@ -1,4 +1,18 @@
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = resolveApiBaseUrl();
+
+function resolveApiBaseUrl() {
+	const configuredBase = window.localStorage.getItem('apiBaseUrl');
+
+	if (configuredBase && configuredBase.trim()) {
+		return configuredBase.trim().replace(/\/$/, '');
+	}
+
+	if (window.location.protocol === 'file:') {
+		return 'http://localhost:8080';
+	}
+
+	return `${window.location.origin}/api`;
+}
 
 const ASSET_TYPES = ['stocks', 'bonds', 'mutual funds'];
 const ASSET_TYPE_LABELS = {

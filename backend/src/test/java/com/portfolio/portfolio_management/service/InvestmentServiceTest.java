@@ -44,14 +44,14 @@ class InvestmentServiceTest {
     private TransactionHistoryRepository transactionHistoryRepository;
 
     @Mock
-    private PriceService priceService;
+    private MarketPriceService marketPriceService;
 
     private InvestmentServiceImpl investmentService;
 
     @BeforeEach
     void setUp() {
         investmentService = new InvestmentServiceImpl(investmentRepository, portfolioRepository, assetRepository,
-                transactionHistoryRepository, priceService);
+                transactionHistoryRepository, marketPriceService);
     }
 
     private Portfolio samplePortfolio(int portfolioId) {
