@@ -24,7 +24,7 @@ COPY --from=build /workspace/app.jar /app/app.jar
 RUN chown portfolio:portfolio /app/app.jar
 
 USER portfolio
-EXPOSE 8080
+EXPOSE 8090
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-  CMD wget -qO- http://localhost:8080/v3/api-docs >/dev/null || exit 1
+  CMD wget -qO- http://localhost:8090/v3/api-docs >/dev/null || exit 1
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]

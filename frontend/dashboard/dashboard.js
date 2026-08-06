@@ -41,7 +41,7 @@ function getApiBase() {
     }
 
     if (window.location.protocol === "file:") {
-        return "http://localhost:8080";
+        return "http://localhost:8090";
     }
 
     return `${window.location.origin}/api`;

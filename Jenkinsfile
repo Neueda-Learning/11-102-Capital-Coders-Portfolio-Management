@@ -10,8 +10,8 @@ pipeline {
     environment {
         COMPOSE_CMD_FILE = '.compose_cmd'
         ENV_FILE = '.env'
-        APP_PORT = '0'
-        BACKEND_PORT = '0'
+        APP_PORT = '8085'
+        BACKEND_PORT = '8090'
         MYSQL_PORT = '3306'
     }
 
@@ -80,8 +80,8 @@ MYSQL_DATABASE=${env.MYSQL_DATABASE ?: 'portfolio_management'}
 MYSQL_USER=${env.MYSQL_USER ?: 'portfolio_user'}
 MYSQL_PASSWORD=${env.MYSQL_PASSWORD ?: 'portfolio_password'}
 MYSQL_PORT=${env.MYSQL_PORT ?: '3306'}
-APP_PORT=${env.APP_PORT ?: '0'}
-BACKEND_PORT=${env.BACKEND_PORT ?: '0'}
+APP_PORT=${env.APP_PORT ?: '8085'}
+BACKEND_PORT=${env.BACKEND_PORT ?: '8090'}
 TWELVE_DATA_BASE_URL=${env.TWELVE_DATA_BASE_URL ?: 'https://api.twelvedata.com'}
 TWELVE_DATA_API_KEY=${twelveDataKey}
 TWELVE_DATA_CACHE_MS=${env.TWELVE_DATA_CACHE_MS ?: '120000'}
@@ -112,7 +112,7 @@ NEWS_API_CACHE_MS=${env.NEWS_API_CACHE_MS ?: '300000'}
                     def composeCmd = readFile(env.COMPOSE_CMD_FILE).trim()
                     sh """
 for i in \$(seq 1 30); do
-  if ${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://localhost:8080/v3/api-docs >/dev/null'; then
+  if ${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://localhost:8090/v3/api-docs >/dev/null'; then
     echo "Backend health endpoint is ready."
     break
   fi
