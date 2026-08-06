@@ -77,11 +77,11 @@ fi
                     def newsApiKey = (env.NEWS_API_KEY ?: '').trim()
 
                     if (!twelveDataKey) {
-                        echo 'TWELVE_DATA_API_KEY is not configured. Live market price endpoints will return validation errors until it is supplied.'
+                        error('TWELVE_DATA_API_KEY is not configured. Failing deployment because live market price endpoints require it.')
                     }
 
                     if (!newsApiKey) {
-                        echo 'NEWS_API_KEY is not configured. News endpoints will return validation errors until it is supplied.'
+                        error('NEWS_API_KEY is not configured. Failing deployment because news endpoints require it.')
                     }
 
                     def envContent = """
@@ -121,6 +121,12 @@ NEWS_API_CACHE_MS=${env.NEWS_API_CACHE_MS ?: '300000'}
                 script {
                     def composeCmd = readFile(env.COMPOSE_CMD_FILE).trim()
                     sh """
+if ! grep -E '^TWELVE_DATA_API_KEY=.+' .env >/dev/null; then
+  echo 'Generated .env is missing TWELVE_DATA_API_KEY value.'
+  exit 1
+fi
+"""
+                    sh """
 for i in \$(seq 1 30); do
   if ${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://localhost:8090/v3/api-docs >/dev/null'; then
     echo "Backend health endpoint is ready."
@@ -133,6 +139,10 @@ for i in \$(seq 1 30); do
   echo "Waiting for backend readiness... (\$i/30)"
   sleep 5
 done
+"""
+
+                    sh """
+${composeCmd} --env-file .env exec -T backend sh -c 'test -n "\$TWELVE_DATA_API_KEY"'
 """
 
                     sh "${composeCmd} --env-file .env exec -T backend sh -c 'wget -qO- http://frontend/login/login.html >/dev/null'"
