@@ -704,11 +704,5 @@ WHERE NOT EXISTS (
 );
 
 UPDATE investment
-SET purchase_price = CASE
-        WHEN purchase_price IS NULL OR purchase_price = 0 THEN amount_invested
-        ELSE purchase_price
-    END,
-    quantity = CASE
-        WHEN quantity IS NULL OR quantity = 0 THEN 1
-        ELSE quantity
-    END;
+SET quantity = 1
+WHERE quantity IS NULL OR quantity = 0;

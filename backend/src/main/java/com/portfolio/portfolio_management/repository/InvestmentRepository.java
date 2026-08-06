@@ -25,6 +25,7 @@ public class InvestmentRepository {
                     rs.getInt("asset_id"),
                     rs.getDouble("amount_invested"),
                     rs.getDouble("current_value"),
+                    rs.getDouble("quantity"),
                     rs.getDate("purchase_date") == null
                             ? null
                             : rs.getDate("purchase_date").toLocalDate()
@@ -39,6 +40,7 @@ public class InvestmentRepository {
                     rs.getString("asset_type"),
                     rs.getDouble("amount_invested"),
                     rs.getDouble("current_value"),
+                    rs.getDouble("quantity"),
                     rs.getDate("purchase_date") == null
                             ? null
                             : rs.getDate("purchase_date").toLocalDate()
@@ -53,6 +55,7 @@ public class InvestmentRepository {
                        a.asset_type,
                        i.amount_invested,
                        i.current_value,
+                       i.quantity,
                        i.purchase_date
                 FROM investment i
                 JOIN asset a ON a.asset_id = i.asset_id
@@ -76,6 +79,19 @@ public class InvestmentRepository {
         return investments.stream().findFirst();
     }
 
+    public Optional<Investment> getInvestmentByPortfolioIdAndAssetId(Integer portfolioId, Integer assetId) {
+        String sql = "SELECT * FROM investment WHERE portfolio_id = ? AND asset_id = ?";
+
+        List<Investment> investments = jdbcTemplate.query(
+                sql,
+                INVESTMENT_ROW_MAPPER,
+                portfolioId,
+                assetId
+        );
+
+        return investments.stream().findFirst();
+    }
+
     public Investment addInvestment(Investment investment) {
         String sql = """
                 INSERT INTO investment
@@ -83,8 +99,9 @@ public class InvestmentRepository {
                  asset_id,
                  amount_invested,
                  current_value,
+                 quantity,
                  purchase_date)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         jdbcTemplate.update(
@@ -93,6 +110,7 @@ public class InvestmentRepository {
                 investment.assetId(),
                 investment.amountInvested(),
                 investment.currentValue(),
+                investment.quantity(),
                 investment.purchaseDate()
         );
 
@@ -111,6 +129,7 @@ public class InvestmentRepository {
                 SET asset_id=?,
                     amount_invested=?,
                     current_value=?,
+                    quantity=?,
                     purchase_date=?
                 WHERE investment_id=? AND portfolio_id=?
                 """;
@@ -120,6 +139,7 @@ public class InvestmentRepository {
                 investment.assetId(),
                 investment.amountInvested(),
                 investment.currentValue(),
+                investment.quantity(),
                 investment.purchaseDate(),
                 investmentId,
                 portfolioId

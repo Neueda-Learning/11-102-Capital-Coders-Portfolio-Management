@@ -1,5 +1,6 @@
 package com.portfolio.portfolio_management.service;
 
+import com.portfolio.portfolio_management.exception.AssetNotFoundException;
 import com.portfolio.portfolio_management.model.Asset;
 import com.portfolio.portfolio_management.model.LiveMarketPrice;
 import com.portfolio.portfolio_management.repository.AssetRepository;

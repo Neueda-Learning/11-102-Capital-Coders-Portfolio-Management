@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const investmentsByType = document.getElementById('investmentsByType');
 	const emptyState = document.getElementById('emptyState');
-	const addInvestmentBtn = document.getElementById('addInvestmentBtn');
+	const buyBtn = document.getElementById('buyBtn');
 
 	const viewModal = document.getElementById('viewInvestmentModal');
 	const viewModalBody = document.getElementById('viewModalBody');
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const closeFormModalBtn = document.getElementById('closeFormModalBtn');
 	const cancelFormBtn = document.getElementById('cancelFormBtn');
 	const investmentForm = document.getElementById('investmentForm');
-	const formModeInput = document.getElementById('formMode');
 	const formInvestmentIdInput = document.getElementById('formInvestmentId');
 	const formAssetIdInput = document.getElementById('formAssetId');
 	const formPurchasePriceInput = document.getElementById('formPurchasePrice');
@@ -46,6 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	const formModalTitle = document.getElementById('formModalTitle');
 	const submitFormBtn = document.getElementById('submitFormBtn');
 	const formMessage = document.getElementById('formMessage');
+
+	const tradeModal = document.getElementById('tradeModal');
+	const tradeModalTitle = document.getElementById('tradeModalTitle');
+	const closeTradeModalBtn = document.getElementById('closeTradeModalBtn');
+	const cancelTradeBtn = document.getElementById('cancelTradeBtn');
+	const tradeForm = document.getElementById('tradeForm');
+	const tradeModeInput = document.getElementById('tradeMode');
+	const tradeInvestmentIdInput = document.getElementById('tradeInvestmentId');
+	const tradeAssetIdInput = document.getElementById('tradeAssetId');
+	const tradeHoldingInfo = document.getElementById('tradeHoldingInfo');
+	const tradeLivePrice = document.getElementById('tradeLivePrice');
+	const tradeQuantityInput = document.getElementById('tradeQuantity');
+	const tradeEstimate = document.getElementById('tradeEstimate');
+	const tradeMessage = document.getElementById('tradeMessage');
+	const submitTradeBtn = document.getElementById('submitTradeBtn');
+
+	const transactionsModal = document.getElementById('transactionsModal');
+	const transactionsModalBody = document.getElementById('transactionsModalBody');
+	const closeTransactionsModalBtn = document.getElementById('closeTransactionsModalBtn');
 
 	if (
 		!pageTitle ||
@@ -63,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		!gainLossLabel ||
 		!investmentsByType ||
 		!emptyState ||
-		!addInvestmentBtn ||
 		!viewModal ||
 		!viewModalBody ||
 		!closeViewModalBtn ||
@@ -71,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		!closeFormModalBtn ||
 		!cancelFormBtn ||
 		!investmentForm ||
-		!formModeInput ||
 		!formInvestmentIdInput ||
 		!formAssetIdInput ||
 		!formPurchasePriceInput ||
@@ -80,7 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		!formLiveMarketPrice ||
 		!formModalTitle ||
 		!submitFormBtn ||
-		!formMessage
+		!formMessage ||
+		!buyBtn ||
+		!tradeModal ||
+		!tradeModalTitle ||
+		!closeTradeModalBtn ||
+		!cancelTradeBtn ||
+		!tradeForm ||
+		!tradeModeInput ||
+		!tradeInvestmentIdInput ||
+		!tradeAssetIdInput ||
+		!tradeHoldingInfo ||
+		!tradeLivePrice ||
+		!tradeQuantityInput ||
+		!tradeEstimate ||
+		!tradeMessage ||
+		!submitTradeBtn ||
+		!transactionsModal ||
+		!transactionsModalBody ||
+		!closeTransactionsModalBtn
 	) {
 		return;
 	}
@@ -95,13 +129,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	formPurchaseDateInput.max = getTodayIsoDate();
 	initializePage();
 
-	addInvestmentBtn.addEventListener('click', () => openFormModal('add'));
 	formAssetIdInput.addEventListener('change', async () => {
 		await loadCurrentMarketPriceForSelectedAsset();
 	});
 	closeViewModalBtn.addEventListener('click', closeViewModal);
 	closeFormModalBtn.addEventListener('click', closeFormModal);
 	cancelFormBtn.addEventListener('click', closeFormModal);
+
+	buyBtn.addEventListener('click', () => openTradeModal('buy'));
+	closeTradeModalBtn.addEventListener('click', closeTradeModal);
+	cancelTradeBtn.addEventListener('click', closeTradeModal);
+	closeTransactionsModalBtn.addEventListener('click', closeTransactionsModal);
+
+	tradeAssetIdInput.addEventListener('change', async () => {
+		await loadCurrentMarketPriceForTrade();
+	});
+	tradeQuantityInput.addEventListener('input', updateTradeEstimate);
 
 	viewModal.addEventListener('click', (event) => {
 		if (event.target === viewModal) {
@@ -115,10 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	tradeModal.addEventListener('click', (event) => {
+		if (event.target === tradeModal) {
+			closeTradeModal();
+		}
+	});
+
+	transactionsModal.addEventListener('click', (event) => {
+		if (event.target === transactionsModal) {
+			closeTransactionsModal();
+		}
+	});
+
 	document.addEventListener('keydown', (event) => {
 		if (event.key === 'Escape') {
 			closeViewModal();
 			closeFormModal();
+			closeTradeModal();
+			closeTransactionsModal();
 		}
 	});
 
@@ -143,16 +200,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
-		if (target.classList.contains('update-btn')) {
+		if (target.classList.contains('sell-btn')) {
 			const investment = investments.find((item) => item.investmentId === investmentId);
 			if (investment) {
-				openFormModal('update', investment);
+				openTradeModal('sell', investment);
 			}
 			return;
 		}
 
-		if (target.classList.contains('delete-btn')) {
-			await handleDeleteInvestment(investmentId);
+		if (target.classList.contains('transactions-btn')) {
+			await handleShowTransactions(investmentId);
 		}
 	});
 
@@ -160,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		event.preventDefault();
 		clearFormMessage();
 
-		const mode = formModeInput.value;
 		const investmentId = Number(formInvestmentIdInput.value);
 		const payload = {
 			assetId: Number(formAssetIdInput.value),
@@ -169,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			purchaseDate: formPurchaseDateInput.value
 		};
 
-		const validationMessage = validateFormPayload(payload, mode, investmentId);
+		const validationMessage = validateFormPayload(payload, investmentId);
 		if (validationMessage) {
 			setFormMessage(validationMessage, true);
 			return;
@@ -178,11 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		submitFormBtn.disabled = true;
 
 		try {
-			if (mode === 'add') {
-				await addInvestment(payload);
-			} else {
-				await updateInvestment(investmentId, payload);
-			}
+			await updateInvestment(investmentId, payload);
 
 			closeFormModal();
 			await Promise.all([loadInvestments(), loadPortfolioSummary()]);
@@ -190,6 +242,40 @@ document.addEventListener('DOMContentLoaded', () => {
 			setFormMessage(error instanceof Error ? error.message : 'Unable to save investment.', true);
 		} finally {
 			submitFormBtn.disabled = false;
+		}
+	});
+
+	tradeForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		clearTradeMessage();
+
+		const mode = tradeModeInput.value;
+		const payload = {
+			assetId: Number(tradeAssetIdInput.value),
+			quantity: Number(tradeQuantityInput.value)
+		};
+
+		const validationMessage = validateTradePayload(payload, mode);
+		if (validationMessage) {
+			setTradeMessage(validationMessage, true);
+			return;
+		}
+
+		submitTradeBtn.disabled = true;
+
+		try {
+			if (mode === 'buy') {
+				await buyInvestment(payload);
+			} else {
+				await sellInvestment(payload);
+			}
+
+			closeTradeModal();
+			await Promise.all([loadInvestments(), loadPortfolioSummary()]);
+		} catch (error) {
+			setTradeMessage(error instanceof Error ? error.message : `Unable to ${mode} investment.`, true);
+		} finally {
+			submitTradeBtn.disabled = false;
 		}
 	});
 
@@ -217,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function renderAssetOptions() {
 		formAssetIdInput.innerHTML = '<option value="">Select an asset</option>';
+		tradeAssetIdInput.innerHTML = '<option value="">Select an asset</option>';
 
 		assets.forEach((asset) => {
 			const assetId = Number(asset.assetId ?? asset.asset_id ?? 0);
@@ -228,11 +315,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			const assetName = firstNonEmpty(asset.assetName, asset.asset_name);
 			const normalizedType = normalizeAssetType(asset.assetType ?? asset.asset_type);
 			const typeLabel = normalizedType ? ASSET_TYPE_LABELS[normalizedType] : 'Unknown';
+			const optionLabel = `${ticker} - ${assetName} (${typeLabel})`;
 
 			const option = document.createElement('option');
 			option.value = String(assetId);
-			option.textContent = `${ticker} - ${assetName} (${typeLabel})`;
+			option.textContent = optionLabel;
 			formAssetIdInput.appendChild(option);
+
+			const tradeOption = document.createElement('option');
+			tradeOption.value = String(assetId);
+			tradeOption.textContent = optionLabel;
+			tradeAssetIdInput.appendChild(tradeOption);
 		});
 	}
 
@@ -289,13 +382,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		investmentsByType.innerHTML = '';
 		emptyState.textContent = 'No investments in this portfolio.';
 
-		if (investments.length === 0) {
+		const visibleInvestments = investments.filter(
+			(investment) => Number(investment.quantity) > 0
+		);
+
+		if (visibleInvestments.length === 0) {
 			emptyState.hidden = false;
 		} else {
 			emptyState.hidden = true;
 		}
 
-		const grouped = groupInvestmentsByType(investments);
+		const grouped = groupInvestmentsByType(visibleInvestments);
 
 		ASSET_TYPES.forEach((typeKey) => {
 			const section = document.createElement('section');
@@ -316,19 +413,19 @@ document.addEventListener('DOMContentLoaded', () => {
 				grouped[typeKey].forEach((investment) => {
 					const row = document.createElement('article');
 					row.className = 'asset-item';
+
+					const livePrice = getLivePriceFromInvestment(investment);
+
 					row.innerHTML = `
 						<div class="asset-item-main">
 							<div class="asset-item-line"><strong>${escapeHtml(investment.tickerSymbol || '-')}</strong></div>
-							<div class="asset-item-line">Purchase Price: ${formatCurrency(investment.purchasePrice)}</div>
-							<div class="asset-item-line">Quantity: ${formatNumber(investment.quantity)}</div>
-							<div class="asset-item-line">Current Market Price: ${formatCurrency(getLivePriceFromInvestment(investment))}</div>
-							<div class="asset-item-line">Amount Invested: ${formatCurrency(investment.amountInvested)}</div>
-							<div class="asset-item-line">Purchase Date: ${formatDate(investment.purchaseDate)}</div>
+							<div class="asset-item-line">Quantity Held: ${formatNumber(investment.quantity)}</div>
+							<div class="asset-item-line">Holdings: ${formatCurrency(investment.currentValue)}</div>
 						</div>
 						<div class="actions">
 							<button type="button" class="secondary-btn view-btn" data-id="${investment.investmentId}">View</button>
-							<button type="button" class="secondary-btn update-btn" data-id="${investment.investmentId}">Update</button>
-							<button type="button" class="danger-btn delete-btn" data-id="${investment.investmentId}">Delete</button>
+							<button type="button" class="secondary-btn sell-btn" data-id="${investment.investmentId}">Sell</button>
+							<button type="button" class="secondary-btn transactions-btn" data-id="${investment.investmentId}">Transactions</button>
 						</div>
 					`;
 					itemsContainer.appendChild(row);
@@ -478,7 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				tickerSymbol: '-',
 				assetType: '-',
 				assetId: '-',
-				purchasePrice: 0,
 				quantity: 0,
 				amountInvested: 0,
 				currentValue: 0,
@@ -492,16 +588,22 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (investment.error) {
 			viewModalBody.innerHTML = `<p>${escapeHtml(investment.error)}</p>`;
 		} else {
+			const avgCost = getAverageCostFromInvestment(investment);
+			const livePrice = getLivePriceFromInvestment(investment);
+			const gainLoss = getGainLossInfo(investment);
+			const gainLossClass = gainLossClassFor(gainLoss.label);
+
 			viewModalBody.innerHTML = `
 				<p><strong>Investment ID:</strong> ${escapeHtml(String(investment.investmentId))}</p>
 				<p><strong>Portfolio ID:</strong> ${escapeHtml(String(portfolioId))}</p>
 				<p><strong>Asset ID:</strong> ${escapeHtml(String(investment.assetId))}</p>
-				<p><strong>Purchase Price:</strong> ${formatCurrency(investment.purchasePrice)}</p>
-				<p><strong>Quantity:</strong> ${formatNumber(investment.quantity)}</p>
-				<p><strong>Amount Invested:</strong> ${formatCurrency(investment.amountInvested)}</p>
-				<p><strong>Live Price Used:</strong> ${formatCurrency(getLivePriceFromInvestment(investment))}</p>
+				<p><strong>Quantity Held:</strong> ${formatNumber(investment.quantity)}</p>
+				<p><strong>Avg. Cost / Unit:</strong> ${formatCurrency(avgCost)}</p>
+				<p><strong>Current Price / Unit:</strong> ${formatCurrency(livePrice)}</p>
+				<p><strong>Total Invested:</strong> ${formatCurrency(investment.amountInvested)}</p>
 				<p><strong>Current Value:</strong> ${formatCurrency(investment.currentValue)}</p>
-				<p><strong>Purchase Date:</strong> ${formatDate(investment.purchaseDate)}</p>
+				<p class="${gainLossClass}"><strong>Gain/Loss:</strong> ${formatCurrency(gainLoss.amount)} (${formatPercent(gainLoss.percent)}%)</p>
+				<p><strong>Held Since:</strong> ${formatDate(investment.purchaseDate)}</p>
 			`;
 		}
 
@@ -512,29 +614,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		viewModal.hidden = true;
 	}
 
-	function openFormModal(mode, investment) {
-		formModeInput.value = mode;
+	function openFormModal(investment) {
 		formMessage.textContent = '';
 		formMessage.style.color = '#0f172a';
 		formPurchaseDateInput.max = getTodayIsoDate();
 
-		if (mode === 'update' && investment) {
-			formModalTitle.textContent = 'Update Investment';
-			submitFormBtn.textContent = 'Update';
-			formInvestmentIdInput.value = String(investment.investmentId);
-			formAssetIdInput.value = String(investment.assetId);
-			formPurchasePriceInput.value = String(investment.purchasePrice);
-			formQuantityInput.value = String(investment.quantity);
-			formPurchaseDateInput.value = normalizeDateForInput(investment.purchaseDate);
-			setMarketPriceMessage(`Current Market Price: ${formatCurrency(getLivePriceFromInvestment(investment))}`, false);
-		} else {
-			formModalTitle.textContent = 'Add Investment';
-			submitFormBtn.textContent = 'Add';
-			formInvestmentIdInput.value = '';
-			investmentForm.reset();
-			formAssetIdInput.value = '';
-			setMarketPriceMessage('Current Market Price: -', false);
-		}
+		formModalTitle.textContent = 'Update Investment';
+		submitFormBtn.textContent = 'Update';
+		formInvestmentIdInput.value = String(investment.investmentId);
+		formAssetIdInput.value = String(investment.assetId);
+		formPurchasePriceInput.value = String(investment.purchasePrice);
+		formQuantityInput.value = String(investment.quantity);
+		formPurchaseDateInput.value = normalizeDateForInput(investment.purchaseDate);
+		setMarketPriceMessage(`Current Market Price: ${formatCurrency(getLivePriceFromInvestment(investment))}`, false);
 
 		formModal.hidden = false;
 	}
@@ -581,7 +673,190 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 
-	function validateFormPayload(payload, mode, investmentId) {
+	function openTradeModal(mode, investment) {
+		tradeModeInput.value = mode;
+		tradeMessage.textContent = '';
+		tradeMessage.style.color = '#0f172a';
+		tradeForm.reset();
+		tradeAssetIdInput.value = '';
+		tradeEstimate.textContent = 'Estimated Total: -';
+		setTradeLivePriceMessage('Current Market Price: -', false);
+
+		if (mode === 'sell' && investment) {
+			tradeModalTitle.textContent = 'Sell';
+			submitTradeBtn.textContent = 'Sell';
+			tradeInvestmentIdInput.value = String(investment.investmentId);
+			tradeAssetIdInput.value = String(investment.assetId);
+			tradeAssetIdInput.disabled = true;
+			tradeQuantityInput.max = String(investment.quantity);
+			tradeHoldingInfo.hidden = false;
+			tradeHoldingInfo.textContent = `You currently hold ${formatNumber(investment.quantity)} units of ${investment.tickerSymbol || 'this asset'}.`;
+			loadCurrentMarketPriceForTrade();
+		} else {
+			tradeModalTitle.textContent = 'Buy';
+			submitTradeBtn.textContent = 'Buy';
+			tradeInvestmentIdInput.value = '';
+			tradeAssetIdInput.disabled = false;
+			tradeQuantityInput.removeAttribute('max');
+			tradeHoldingInfo.hidden = true;
+			tradeHoldingInfo.textContent = '';
+		}
+
+		tradeModal.hidden = false;
+	}
+
+	function closeTradeModal() {
+		tradeModal.hidden = true;
+		tradeForm.reset();
+		tradeAssetIdInput.disabled = false;
+		tradeQuantityInput.removeAttribute('max');
+		tradeHoldingInfo.hidden = true;
+		setTradeLivePriceMessage('Current Market Price: -', false);
+		tradeEstimate.textContent = 'Estimated Total: -';
+		clearTradeMessage();
+	}
+
+	async function loadCurrentMarketPriceForTrade() {
+		const assetId = Number(tradeAssetIdInput.value);
+		if (!Number.isFinite(assetId) || assetId <= 0) {
+			setTradeLivePriceMessage('Current Market Price: -', false);
+			return;
+		}
+
+		const cached = livePriceCache.get(assetId);
+		if (cached) {
+			setTradeLivePriceMessage(`Current Market Price: ${formatCurrency(cached)}`, false);
+			updateTradeEstimate();
+			return;
+		}
+
+		setTradeLivePriceMessage('Current Market Price: Loading...', false);
+
+		try {
+			const quote = await fetchJson(
+				`${API_BASE_URL}/assets/${encodeURIComponent(assetId)}/live-price`
+			);
+			const price = Number(quote.price ?? 0);
+			if (!Number.isFinite(price) || price <= 0) {
+				throw new Error('Current market price is unavailable for this asset.');
+			}
+			livePriceCache.set(assetId, price);
+			setTradeLivePriceMessage(`Current Market Price: ${formatCurrency(price)}`, false);
+			updateTradeEstimate();
+		} catch (error) {
+			setTradeLivePriceMessage(
+				error instanceof Error ? error.message : 'Unable to load current market price.',
+				true
+			);
+		}
+	}
+
+	function updateTradeEstimate() {
+		const assetId = Number(tradeAssetIdInput.value);
+		const quantity = Number(tradeQuantityInput.value);
+		const price = livePriceCache.get(assetId);
+
+		if (!Number.isFinite(price) || !Number.isFinite(quantity) || quantity <= 0) {
+			tradeEstimate.textContent = 'Estimated Total: -';
+			return;
+		}
+
+		tradeEstimate.textContent = `Estimated Total: ${formatCurrency(price * quantity)}`;
+	}
+
+	function validateTradePayload(payload, mode) {
+		if (!Number.isFinite(payload.assetId) || payload.assetId <= 0) {
+			return 'Please select an asset.';
+		}
+
+		if (!Number.isFinite(payload.quantity) || payload.quantity <= 0) {
+			return 'Please enter a valid quantity.';
+		}
+
+		if (mode === 'sell') {
+			const max = Number(tradeQuantityInput.max);
+			if (Number.isFinite(max) && payload.quantity > max) {
+				return `You only hold ${formatNumber(max)} units.`;
+			}
+		}
+
+		return null;
+	}
+
+	async function buyInvestment(payload) {
+		await fetchJson(`${API_BASE_URL}/portfolios/${encodeURIComponent(portfolioId)}/investments/buy`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		});
+	}
+
+	async function sellInvestment(payload) {
+		await fetchJson(`${API_BASE_URL}/portfolios/${encodeURIComponent(portfolioId)}/investments/sell`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		});
+	}
+
+	async function handleShowTransactions(investmentId) {
+		transactionsModalBody.innerHTML = '<p>Loading...</p>';
+		transactionsModal.hidden = false;
+
+		try {
+			const data = await fetchJson(
+				`${API_BASE_URL}/portfolios/${encodeURIComponent(portfolioId)}/investments/${encodeURIComponent(investmentId)}/transactions`
+			);
+			const transactions = Array.isArray(data) ? data : [];
+			renderTransactions(transactions);
+		} catch (error) {
+			transactionsModalBody.innerHTML = `<p>${escapeHtml(error instanceof Error ? error.message : 'Unable to load transaction history.')}</p>`;
+		}
+	}
+
+	function renderTransactions(transactions) {
+		if (transactions.length === 0) {
+			transactionsModalBody.innerHTML = '<p>No transactions recorded for this investment.</p>';
+			return;
+		}
+
+		transactionsModalBody.innerHTML = transactions
+			.map((transaction) => {
+				const type = firstNonEmpty(transaction.transactionType, transaction.transaction_type);
+				return `
+					<p>
+						<strong>${escapeHtml(type)}</strong>
+						&mdash; ${formatNumber(Number(transaction.quantity ?? 0))} units
+						@ ${formatCurrency(Number(transaction.pricePerUnit ?? transaction.price_per_unit ?? 0))}
+						= ${formatCurrency(Number(transaction.transactionAmount ?? transaction.amount ?? 0))}
+						on ${formatDate(transaction.transactionDate ?? transaction.transaction_date)}
+					</p>
+				`;
+			})
+			.join('');
+	}
+
+	function closeTransactionsModal() {
+		transactionsModal.hidden = true;
+		transactionsModalBody.innerHTML = '';
+	}
+
+	function setTradeMessage(message, isError) {
+		tradeMessage.textContent = message;
+		tradeMessage.style.color = isError ? '#b91c1c' : '#166534';
+	}
+
+	function clearTradeMessage() {
+		tradeMessage.textContent = '';
+		tradeMessage.style.color = '#0f172a';
+	}
+
+	function setTradeLivePriceMessage(message, isError) {
+		tradeLivePrice.textContent = message;
+		tradeLivePrice.style.color = isError ? '#b91c1c' : '#334155';
+	}
+
+	function validateFormPayload(payload, investmentId) {
 		if (!Number.isFinite(payload.assetId) || payload.assetId <= 0) {
 			return 'Please select an asset.';
 		}
@@ -609,9 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const totalFunds = Number(summary.totalFunds ?? 0);
 		const currentUsed = Number(summary.usedFunds ?? 0);
 		const nextAmount = payload.purchasePrice * payload.quantity;
-		const oldInvestment = mode === 'update'
-			? investments.find((item) => item.investmentId === investmentId)
-			: null;
+		const oldInvestment = investments.find((item) => item.investmentId === investmentId);
 
 		const nextUsed = currentUsed + nextAmount - (oldInvestment ? oldInvestment.amountInvested : 0);
 		if (nextUsed > totalFunds) {
@@ -619,14 +892,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		return null;
-	}
-
-	async function addInvestment(payload) {
-		await fetchJson(`${API_BASE_URL}/portfolios/${encodeURIComponent(portfolioId)}/investments`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload)
-		});
 	}
 
 	async function updateInvestment(investmentId, payload) {
@@ -806,6 +1071,39 @@ function getLivePriceFromInvestment(investment) {
 		return 0;
 	}
 	return investment.currentValue / investment.quantity;
+}
+
+function getAverageCostFromInvestment(investment) {
+	if (!Number.isFinite(investment.quantity) || investment.quantity <= 0) {
+		return 0;
+	}
+	return investment.amountInvested / investment.quantity;
+}
+
+function getGainLossInfo(investment) {
+	const invested = Number.isFinite(investment.amountInvested) ? investment.amountInvested : 0;
+	const current = Number.isFinite(investment.currentValue) ? investment.currentValue : 0;
+	const amount = current - invested;
+	const percent = invested > 0 ? (amount / invested) * 100 : 0;
+
+	let label = 'Neutral';
+	if (amount > 0) {
+		label = 'Gain';
+	} else if (amount < 0) {
+		label = 'Loss';
+	}
+
+	return { amount, percent, label };
+}
+
+function gainLossClassFor(label) {
+	if (label === 'Gain') {
+		return 'gain-positive';
+	}
+	if (label === 'Loss') {
+		return 'gain-negative';
+	}
+	return 'gain-neutral';
 }
 
 function formatDate(value) {

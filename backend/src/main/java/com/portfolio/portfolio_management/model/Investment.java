@@ -8,6 +8,7 @@ public record Investment(
         int assetId,
         double amountInvested,
         double currentValue,
+        double quantity,
         LocalDate purchaseDate
 ) {
 }

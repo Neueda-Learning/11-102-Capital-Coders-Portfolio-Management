@@ -6,6 +6,7 @@ public record InvestmentRequest(
         int assetId,
         double amountInvested,
         double currentValue,
+        Double quantity,
         LocalDate purchaseDate
 ) {
 }

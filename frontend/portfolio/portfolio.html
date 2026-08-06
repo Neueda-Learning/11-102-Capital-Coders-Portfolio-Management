@@ -21,7 +21,7 @@
 			<h2 id="investorHeading">Investor Details</h2>
 			<div id="investorDetails" class="investor-grid"></div>
 			<div class="section-actions">
-				<button id="addInvestmentBtn" class="primary-btn" type="button">Add Investment</button>
+				<button id="buyBtn" class="primary-btn" type="button">Buy</button>
 			</div>
 		</section>
 
@@ -94,11 +94,10 @@
 	<div id="investmentFormModal" class="modal" hidden>
 		<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
 			<div class="modal-header">
-				<h3 id="formModalTitle">Add Investment</h3>
+				<h3 id="formModalTitle">Update Investment</h3>
 				<button id="closeFormModalBtn" class="icon-btn" type="button" aria-label="Close modal">&times;</button>
 			</div>
 			<form id="investmentForm" class="investment-form">
-				<input type="hidden" id="formMode" value="add">
 				<input type="hidden" id="formInvestmentId" value="">
 				<label for="formAssetId">Asset</label>
 				<select id="formAssetId" required>
@@ -122,6 +121,48 @@
 					<button id="cancelFormBtn" type="button" class="secondary-btn">Cancel</button>
 				</div>
 			</form>
+		</div>
+	</div>
+
+	<div id="tradeModal" class="modal" hidden>
+		<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="tradeModalTitle">
+			<div class="modal-header">
+				<h3 id="tradeModalTitle">Buy</h3>
+				<button id="closeTradeModalBtn" class="icon-btn" type="button" aria-label="Close modal">&times;</button>
+			</div>
+			<form id="tradeForm" class="investment-form">
+				<input type="hidden" id="tradeMode" value="buy">
+				<input type="hidden" id="tradeInvestmentId" value="">
+
+				<label for="tradeAssetId">Asset</label>
+				<select id="tradeAssetId" required>
+					<option value="">Select an asset</option>
+				</select>
+
+				<p id="tradeHoldingInfo" class="form-message" hidden></p>
+				<p id="tradeLivePrice" class="form-message" aria-live="polite">Current Market Price: -</p>
+
+				<label for="tradeQuantity">Quantity</label>
+				<input id="tradeQuantity" type="number" step="0.0001" min="0.0001" required>
+
+				<p id="tradeEstimate" class="form-message">Estimated Total: -</p>
+
+				<p id="tradeMessage" class="form-message" aria-live="polite"></p>
+				<div class="form-actions">
+					<button id="submitTradeBtn" type="submit" class="primary-btn">Confirm</button>
+					<button id="cancelTradeBtn" type="button" class="secondary-btn">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div id="transactionsModal" class="modal" hidden>
+		<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="transactionsModalTitle">
+			<div class="modal-header">
+				<h3 id="transactionsModalTitle">Transaction History</h3>
+				<button id="closeTransactionsModalBtn" class="icon-btn" type="button" aria-label="Close modal">&times;</button>
+			</div>
+			<div id="transactionsModalBody" class="modal-body"></div>
 		</div>
 	</div>
 

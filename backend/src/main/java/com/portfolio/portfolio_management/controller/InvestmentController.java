@@ -3,6 +3,8 @@ package com.portfolio.portfolio_management.controller;
 import com.portfolio.portfolio_management.model.Investment;
 import com.portfolio.portfolio_management.model.InvestmentListItem;
 import com.portfolio.portfolio_management.model.InvestmentRequest;
+import com.portfolio.portfolio_management.model.TradeRequest;
+import com.portfolio.portfolio_management.model.TransactionHistory;
 import com.portfolio.portfolio_management.service.InvestmentService;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,7 @@ public class InvestmentController {
                 investmentRequest.assetId(),
                 investmentRequest.amountInvested(),
                 investmentRequest.currentValue(),
+                investmentRequest.quantity() == null ? 0 : investmentRequest.quantity(),
                 investmentRequest.purchaseDate()
         );
 
@@ -57,6 +60,7 @@ public class InvestmentController {
                 investmentRequest.assetId(),
                 investmentRequest.amountInvested(),
                 investmentRequest.currentValue(),
+                investmentRequest.quantity() == null ? 0 : investmentRequest.quantity(),
                 investmentRequest.purchaseDate()
         );
 
@@ -69,5 +73,23 @@ public class InvestmentController {
 
         investmentService.deleteInvestment(portfolioId, investmentId);
         return "Investment deleted successfully.";
+    }
+
+    @PostMapping("/buy")
+    public Investment buy(@PathVariable Integer portfolioId,
+                          @RequestBody TradeRequest tradeRequest) {
+        return investmentService.buy(portfolioId, tradeRequest);
+    }
+
+    @PostMapping("/sell")
+    public Investment sell(@PathVariable Integer portfolioId,
+                           @RequestBody TradeRequest tradeRequest) {
+        return investmentService.sell(portfolioId, tradeRequest);
+    }
+
+    @GetMapping("/{investmentId}/transactions")
+    public List<TransactionHistory> getTransactions(@PathVariable Integer portfolioId,
+                                                     @PathVariable Integer investmentId) {
+        return investmentService.getTransactionHistory(portfolioId, investmentId);
     }
 }

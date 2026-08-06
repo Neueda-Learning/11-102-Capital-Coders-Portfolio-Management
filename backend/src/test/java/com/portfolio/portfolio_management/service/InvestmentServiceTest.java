@@ -10,6 +10,7 @@ import com.portfolio.portfolio_management.model.PortfolioSummary;
 import com.portfolio.portfolio_management.repository.AssetRepository;
 import com.portfolio.portfolio_management.repository.InvestmentRepository;
 import com.portfolio.portfolio_management.repository.PortfolioRepository;
+import com.portfolio.portfolio_management.repository.TransactionHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,11 +40,18 @@ class InvestmentServiceTest {
     @Mock
     private AssetRepository assetRepository;
 
+    @Mock
+    private TransactionHistoryRepository transactionHistoryRepository;
+
+    @Mock
+    private PriceService priceService;
+
     private InvestmentServiceImpl investmentService;
 
     @BeforeEach
     void setUp() {
-        investmentService = new InvestmentServiceImpl(investmentRepository, portfolioRepository, assetRepository);
+        investmentService = new InvestmentServiceImpl(investmentRepository, portfolioRepository, assetRepository,
+                transactionHistoryRepository, priceService);
     }
 
     private Portfolio samplePortfolio(int portfolioId) {
@@ -51,7 +59,7 @@ class InvestmentServiceTest {
     }
 
     private Investment sampleInvestment(int investmentId, int portfolioId, int assetId, double amount, double currentValue, LocalDate date) {
-        return new Investment(investmentId, portfolioId, assetId, amount, currentValue, date);
+        return new Investment(investmentId, portfolioId, assetId, amount, currentValue, 0, date);
     }
 
     private PortfolioSummary sampleSummary(double totalFunds) {
@@ -75,7 +83,7 @@ class InvestmentServiceTest {
     @Test
     @DisplayName("getInvestmentsByPortfolioId returns list when portfolio exists")
     void getInvestmentsByPortfolioId_whenPortfolioExists_returnsList() {
-        InvestmentListItem item = new InvestmentListItem(1, 3, 8, "AAPL", "stocks", 2000.0, 2300.0, LocalDate.of(2026, 1, 20));
+        InvestmentListItem item = new InvestmentListItem(1, 3, 8, "AAPL", "stocks", 2000.0, 2300.0, 0, LocalDate.of(2026, 1, 20));
         when(portfolioRepository.getPortfolioById(3)).thenReturn(Optional.of(samplePortfolio(3)));
         when(investmentRepository.getInvestmentsByPortfolioId(3)).thenReturn(List.of(item));
 
@@ -179,7 +187,7 @@ class InvestmentServiceTest {
         when(assetRepository.getAssetById(3)).thenReturn(Optional.of(new Asset(3, "Apple", "AAPL", "stocks")));
         when(portfolioRepository.getPortfolioSummary(1)).thenReturn(Optional.of(sampleSummary(3000.0)));
         when(investmentRepository.getInvestmentsByPortfolioId(1)).thenReturn(List.of(
-                new InvestmentListItem(1, 1, 3, "AAPL", "stocks", 2000.0, 2200.0, LocalDate.of(2026, 1, 1))
+                new InvestmentListItem(1, 1, 3, "AAPL", "stocks", 2000.0, 2200.0, 0, LocalDate.of(2026, 1, 1))
         ));
 
         IllegalArgumentException ex = assertThrows(
@@ -201,7 +209,7 @@ class InvestmentServiceTest {
         when(assetRepository.getAssetById(3)).thenReturn(Optional.of(new Asset(3, "Apple", "AAPL", "stocks")));
         when(portfolioRepository.getPortfolioSummary(1)).thenReturn(Optional.of(sampleSummary(5000.0)));
         when(investmentRepository.getInvestmentsByPortfolioId(1)).thenReturn(List.of(
-                new InvestmentListItem(1, 1, 3, "AAPL", "stocks", 2000.0, 2200.0, LocalDate.of(2026, 1, 1))
+                new InvestmentListItem(1, 1, 3, "AAPL", "stocks", 2000.0, 2200.0, 0, LocalDate.of(2026, 1, 1))
         ));
         when(investmentRepository.addInvestment(candidate)).thenReturn(created);
 
@@ -222,8 +230,8 @@ class InvestmentServiceTest {
         when(assetRepository.getAssetById(3)).thenReturn(Optional.of(new Asset(3, "Apple", "AAPL", "stocks")));
         when(portfolioRepository.getPortfolioSummary(1)).thenReturn(Optional.of(sampleSummary(9000.0)));
         when(investmentRepository.getInvestmentsByPortfolioId(1)).thenReturn(List.of(
-                new InvestmentListItem(5, 1, 3, "AAPL", "stocks", 4000.0, 3900.0, LocalDate.of(2026, 1, 1)),
-                new InvestmentListItem(6, 1, 4, "MSFT", "stocks", 5000.0, 5100.0, LocalDate.of(2026, 1, 1))
+                new InvestmentListItem(5, 1, 3, "AAPL", "stocks", 4000.0, 3900.0, 0, LocalDate.of(2026, 1, 1)),
+                new InvestmentListItem(6, 1, 4, "MSFT", "stocks", 5000.0, 5100.0, 0, LocalDate.of(2026, 1, 1))
         ));
         when(investmentRepository.updateInvestment(5, 1, candidate)).thenReturn(candidate);
 

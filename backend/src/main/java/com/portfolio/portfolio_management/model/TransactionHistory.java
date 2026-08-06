@@ -7,6 +7,8 @@ public record TransactionHistory(
         int investmentId,
         String transactionType,
         double transactionAmount,
+        double quantity,
+        double pricePerUnit,
         LocalDate transactionDate
 ) {
 }
