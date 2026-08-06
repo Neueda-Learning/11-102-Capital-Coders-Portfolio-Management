@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:8080';
 
 const ASSET_TYPES = ['stocks', 'bonds', 'mutual funds'];
 const ASSET_TYPE_LABELS = {

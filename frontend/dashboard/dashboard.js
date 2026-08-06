@@ -34,7 +34,7 @@ empIdSpan.textContent = empId;
 
 
 function getApiBase() {
-    return "/api";
+    return "http://localhost:8080";
 }
 
 function showToast(message, type) {
