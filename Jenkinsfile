@@ -133,13 +133,13 @@ ${composeCmd} --env-file .env port frontend 80 | tail -n 1 | sed -E 's/.*:([0-9]
                     }
 
                     sh """
-for i in $(seq 1 30); do
-  code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${backendPort}/v3/api-docs" || true)
-  if [ "$code" = "200" ]; then
-    echo "Backend health endpoint is ready (HTTP $code)."
+for i in \$(seq 1 30); do
+  code=\$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${backendPort}/v3/api-docs" || true)
+  if [ "\$code" = "200" ]; then
+    echo "Backend health endpoint is ready (HTTP \$code)."
     exit 0
   fi
-  echo "Waiting for backend readiness... ($i/30), last code=$code"
+  echo "Waiting for backend readiness... (\$i/30), last code=\$code"
   sleep 5
 done
 echo "Backend did not become ready in time."
