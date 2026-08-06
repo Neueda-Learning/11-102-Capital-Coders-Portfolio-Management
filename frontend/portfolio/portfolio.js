@@ -39,9 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	const formModeInput = document.getElementById('formMode');
 	const formInvestmentIdInput = document.getElementById('formInvestmentId');
 	const formAssetIdInput = document.getElementById('formAssetId');
-	const formAmountInvestedInput = document.getElementById('formAmountInvested');
-	const formCurrentValueInput = document.getElementById('formCurrentValue');
+	const formPurchasePriceInput = document.getElementById('formPurchasePrice');
+	const formQuantityInput = document.getElementById('formQuantity');
 	const formPurchaseDateInput = document.getElementById('formPurchaseDate');
+	const formLiveMarketPrice = document.getElementById('formLiveMarketPrice');
 	const formModalTitle = document.getElementById('formModalTitle');
 	const submitFormBtn = document.getElementById('submitFormBtn');
 	const formMessage = document.getElementById('formMessage');
@@ -73,9 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		!formModeInput ||
 		!formInvestmentIdInput ||
 		!formAssetIdInput ||
-		!formAmountInvestedInput ||
-		!formCurrentValueInput ||
+		!formPurchasePriceInput ||
+		!formQuantityInput ||
 		!formPurchaseDateInput ||
+		!formLiveMarketPrice ||
 		!formModalTitle ||
 		!submitFormBtn ||
 		!formMessage
@@ -88,11 +90,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	let investments = [];
 	let assets = [];
 	let summary = null;
+	const livePriceCache = new Map();
 
 	formPurchaseDateInput.max = getTodayIsoDate();
 	initializePage();
 
 	addInvestmentBtn.addEventListener('click', () => openFormModal('add'));
+	formAssetIdInput.addEventListener('change', async () => {
+		await loadCurrentMarketPriceForSelectedAsset();
+	});
 	closeViewModalBtn.addEventListener('click', closeViewModal);
 	closeFormModalBtn.addEventListener('click', closeFormModal);
 	cancelFormBtn.addEventListener('click', closeFormModal);
@@ -158,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const investmentId = Number(formInvestmentIdInput.value);
 		const payload = {
 			assetId: Number(formAssetIdInput.value),
-			amountInvested: Number(formAmountInvestedInput.value),
-			currentValue: Number(formCurrentValueInput.value),
+			purchasePrice: Number(formPurchasePriceInput.value),
+			quantity: Number(formQuantityInput.value),
 			purchaseDate: formPurchaseDateInput.value
 		};
 
@@ -313,7 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
 					row.innerHTML = `
 						<div class="asset-item-main">
 							<div class="asset-item-line"><strong>${escapeHtml(investment.tickerSymbol || '-')}</strong></div>
-							<div class="asset-item-line">Amount: ${formatCurrency(investment.amountInvested)}</div>
+							<div class="asset-item-line">Purchase Price: ${formatCurrency(investment.purchasePrice)}</div>
+							<div class="asset-item-line">Quantity: ${formatNumber(investment.quantity)}</div>
+							<div class="asset-item-line">Current Market Price: ${formatCurrency(getLivePriceFromInvestment(investment))}</div>
+							<div class="asset-item-line">Amount Invested: ${formatCurrency(investment.amountInvested)}</div>
 							<div class="asset-item-line">Purchase Date: ${formatDate(investment.purchaseDate)}</div>
 						</div>
 						<div class="actions">
@@ -469,6 +478,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				tickerSymbol: '-',
 				assetType: '-',
 				assetId: '-',
+				purchasePrice: 0,
+				quantity: 0,
 				amountInvested: 0,
 				currentValue: 0,
 				purchaseDate: '-',
@@ -485,7 +496,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				<p><strong>Investment ID:</strong> ${escapeHtml(String(investment.investmentId))}</p>
 				<p><strong>Portfolio ID:</strong> ${escapeHtml(String(portfolioId))}</p>
 				<p><strong>Asset ID:</strong> ${escapeHtml(String(investment.assetId))}</p>
+				<p><strong>Purchase Price:</strong> ${formatCurrency(investment.purchasePrice)}</p>
+				<p><strong>Quantity:</strong> ${formatNumber(investment.quantity)}</p>
 				<p><strong>Amount Invested:</strong> ${formatCurrency(investment.amountInvested)}</p>
+				<p><strong>Live Price Used:</strong> ${formatCurrency(getLivePriceFromInvestment(investment))}</p>
 				<p><strong>Current Value:</strong> ${formatCurrency(investment.currentValue)}</p>
 				<p><strong>Purchase Date:</strong> ${formatDate(investment.purchaseDate)}</p>
 			`;
@@ -509,15 +523,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			submitFormBtn.textContent = 'Update';
 			formInvestmentIdInput.value = String(investment.investmentId);
 			formAssetIdInput.value = String(investment.assetId);
-			formAmountInvestedInput.value = String(investment.amountInvested);
-			formCurrentValueInput.value = String(investment.currentValue);
+			formPurchasePriceInput.value = String(investment.purchasePrice);
+			formQuantityInput.value = String(investment.quantity);
 			formPurchaseDateInput.value = normalizeDateForInput(investment.purchaseDate);
+			setMarketPriceMessage(`Current Market Price: ${formatCurrency(getLivePriceFromInvestment(investment))}`, false);
 		} else {
 			formModalTitle.textContent = 'Add Investment';
 			submitFormBtn.textContent = 'Add';
 			formInvestmentIdInput.value = '';
 			investmentForm.reset();
 			formAssetIdInput.value = '';
+			setMarketPriceMessage('Current Market Price: -', false);
 		}
 
 		formModal.hidden = false;
@@ -527,7 +543,41 @@ document.addEventListener('DOMContentLoaded', () => {
 		formModal.hidden = true;
 		investmentForm.reset();
 		formAssetIdInput.value = '';
+		setMarketPriceMessage('Current Market Price: -', false);
 		clearFormMessage();
+	}
+
+	async function loadCurrentMarketPriceForSelectedAsset() {
+		const assetId = Number(formAssetIdInput.value);
+		if (!Number.isFinite(assetId) || assetId <= 0) {
+			setMarketPriceMessage('Current Market Price: -', false);
+			return;
+		}
+
+		const cached = livePriceCache.get(assetId);
+		if (cached) {
+			setMarketPriceMessage(`Current Market Price: ${formatCurrency(cached)}`, false);
+			return;
+		}
+
+		setMarketPriceMessage('Current Market Price: Loading...', false);
+
+		try {
+			const quote = await fetchJson(
+				`${API_BASE_URL}/assets/${encodeURIComponent(assetId)}/live-price`
+			);
+			const price = Number(quote.price ?? 0);
+			if (!Number.isFinite(price) || price <= 0) {
+				throw new Error('Current market price is unavailable for this asset.');
+			}
+			livePriceCache.set(assetId, price);
+			setMarketPriceMessage(`Current Market Price: ${formatCurrency(price)}`, false);
+		} catch (error) {
+			setMarketPriceMessage(
+				error instanceof Error ? error.message : 'Unable to load current market price.',
+				true
+			);
+		}
 	}
 
 
@@ -536,12 +586,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			return 'Please select an asset.';
 		}
 
-		if (!Number.isFinite(payload.amountInvested) || payload.amountInvested < 0) {
-			return 'Please enter a valid invested amount.';
+		if (!Number.isFinite(payload.purchasePrice) || payload.purchasePrice < 0) {
+			return 'Please enter a valid purchase price.';
 		}
 
-		if (!Number.isFinite(payload.currentValue) || payload.currentValue < 0) {
-			return 'Please enter a valid current value.';
+		if (!Number.isFinite(payload.quantity) || payload.quantity <= 0) {
+			return 'Please enter a valid quantity.';
 		}
 
 		if (!payload.purchaseDate) {
@@ -558,11 +608,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const totalFunds = Number(summary.totalFunds ?? 0);
 		const currentUsed = Number(summary.usedFunds ?? 0);
+		const nextAmount = payload.purchasePrice * payload.quantity;
 		const oldInvestment = mode === 'update'
 			? investments.find((item) => item.investmentId === investmentId)
 			: null;
 
-		const nextUsed = currentUsed + payload.amountInvested - (oldInvestment ? oldInvestment.amountInvested : 0);
+		const nextUsed = currentUsed + nextAmount - (oldInvestment ? oldInvestment.amountInvested : 0);
 		if (nextUsed > totalFunds) {
 			return 'Investment exceeds available portfolio funds.';
 		}
@@ -615,6 +666,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			investmentId: Number(raw.investmentId ?? raw.investment_id ?? 0),
 			portfolioId: Number(raw.portfolioId ?? raw.portfolio_id ?? portfolioId),
 			assetId: Number(raw.assetId ?? raw.asset_id ?? 0),
+			purchasePrice: Number(raw.purchasePrice ?? raw.purchase_price ?? 0),
+			quantity: Number(raw.quantity ?? 0),
 			amountInvested: Number(raw.amountInvested ?? raw.amount_invested ?? 0),
 			currentValue: Number(raw.currentValue ?? raw.current_value ?? 0),
 			purchaseDate: raw.purchaseDate ?? raw.purchase_date ?? '',
@@ -659,6 +712,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	function clearFormMessage() {
 		formMessage.textContent = '';
 		formMessage.style.color = '#0f172a';
+	}
+
+	function setMarketPriceMessage(message, isError) {
+		formLiveMarketPrice.textContent = message;
+		formLiveMarketPrice.style.color = isError ? '#b91c1c' : '#334155';
 	}
 
 });
@@ -732,6 +790,22 @@ function formatPercent(value) {
 		return '0.00';
 	}
 	return value.toFixed(2);
+}
+
+function formatNumber(value) {
+	if (!Number.isFinite(value)) {
+		return '0';
+	}
+	return new Intl.NumberFormat('en-IN', {
+		maximumFractionDigits: 4
+	}).format(value);
+}
+
+function getLivePriceFromInvestment(investment) {
+	if (!Number.isFinite(investment.quantity) || investment.quantity <= 0) {
+		return 0;
+	}
+	return investment.currentValue / investment.quantity;
 }
 
 function formatDate(value) {

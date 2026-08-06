@@ -1,9 +1,11 @@
 package com.portfolio.portfolio_management.controller;
 
 import com.portfolio.portfolio_management.model.Asset;
+import com.portfolio.portfolio_management.model.LiveMarketPrice;
 import com.portfolio.portfolio_management.service.AssetService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,11 @@ public class AssetController {
     @GetMapping
     public List<Asset> getAllAssets() {
         return assetService.getAllAssets();
+    }
+
+    @GetMapping("/{assetId}/live-price")
+    public LiveMarketPrice getLivePrice(@PathVariable Integer assetId) {
+        return assetService.getLivePriceByAssetId(assetId);
     }
 }
 

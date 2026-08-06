@@ -134,23 +134,23 @@ WHERE NOT EXISTS (
 
 
 INSERT INTO asset(asset_name,ticker_symbol,asset_type)
-SELECT 'US Treasury 10Y','UST10Y','bonds'
+SELECT 'iShares 7-10 Year Treasury Bond ETF','IEF','bonds'
 WHERE NOT EXISTS (
-    SELECT 1 FROM asset WHERE ticker_symbol='UST10Y'
+    SELECT 1 FROM asset WHERE ticker_symbol='IEF'
 );
 
 
 INSERT INTO asset(asset_name,ticker_symbol,asset_type)
-SELECT 'Vanguard S&P 500 Index Fund','VFIAX','mutual funds'
+SELECT 'Vanguard S&P 500 ETF','VOO','mutual funds'
 WHERE NOT EXISTS (
-    SELECT 1 FROM asset WHERE ticker_symbol='VFIAX'
+    SELECT 1 FROM asset WHERE ticker_symbol='VOO'
 );
 
 
 INSERT INTO asset(asset_name,ticker_symbol,asset_type)
-SELECT 'Gold ETF','GOLDETF','mutual funds'
+SELECT 'Gold ETF','GLD','mutual funds'
 WHERE NOT EXISTS (
-    SELECT 1 FROM asset WHERE ticker_symbol='GOLDETF'
+    SELECT 1 FROM asset WHERE ticker_symbol='GLD'
 );
 
 
@@ -456,35 +456,35 @@ WHERE NOT EXISTS (
 );
 
 
--- NorthBridge Income Portfolio: UST10Y + VFIAX
+-- NorthBridge Income Portfolio: IEF + VOO
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'NorthBridge Income Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF'),
     180000.00,
     183000.00,
     '2026-02-18'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'NorthBridge Income Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'NorthBridge Income Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO'),
     100000.00,
     104000.00,
     '2026-02-18'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
-    WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'NorthBridge Inc Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX')
+    WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'NorthBridge Income Portfolio')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO')
 );
 
 
--- Summit Balanced Portfolio: AAPL + UST10Y + GOLDETF
+-- Summit Balanced Portfolio: AAPL + IEF + GLD
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Summit Balanced Portfolio'),
@@ -501,27 +501,27 @@ WHERE NOT EXISTS (
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Summit Balanced Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF'),
     130000.00,
     132000.00,
     '2026-03-12'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Summit Balanced Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Summit Balanced Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD'),
     80000.00,
     85000.00,
     '2026-03-12'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Summit Balanced Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD')
 );
 
 
@@ -553,31 +553,31 @@ WHERE NOT EXISTS (
 );
 
 
--- Vertex Dividend Portfolio: VFIAX + UST10Y + CASH-INR
+-- Vertex Dividend Portfolio: VOO + IEF + CASH-INR
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Vertex Dividend Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO'),
     120000.00,
     125000.00,
     '2026-03-28'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Vertex Dividend Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Vertex Dividend Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF'),
     100000.00,
     102000.00,
     '2026-03-28'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Vertex Dividend Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
@@ -594,18 +594,18 @@ WHERE NOT EXISTS (
 );
 
 
--- Aurora Dynamic Portfolio: GOLDETF + MSFT + CASH-INR
+-- Aurora Dynamic Portfolio: GLD + MSFT + CASH-INR
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Aurora Dynamic Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD'),
     90000.00,
     96000.00,
     '2026-04-08'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Aurora Dynamic Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
@@ -635,7 +635,7 @@ WHERE NOT EXISTS (
 );
 
 
--- Crestline Value Portfolio: AAPL + VFIAX
+-- Crestline Value Portfolio: AAPL + VOO
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Crestline Value Portfolio'),
@@ -652,29 +652,29 @@ WHERE NOT EXISTS (
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Crestline Value Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO'),
     95000.00,
     99000.00,
     '2026-04-15'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Crestline Value Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VFIAX')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'VOO')
 );
 
 
--- Horizon Stability Portfolio: UST10Y + CASH-INR + GOLDETF
+-- Horizon Stability Portfolio: IEF + CASH-INR + GLD
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Horizon Stability Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF'),
     150000.00,
     153000.00,
     '2026-04-20'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Horizon Stability Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'UST10Y')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'IEF')
 );
 
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
@@ -693,12 +693,22 @@ WHERE NOT EXISTS (
 INSERT INTO investment (portfolio_id, asset_id, amount_invested, current_value, purchase_date)
 SELECT
     (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Horizon Stability Portfolio'),
-    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF'),
+    (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD'),
     60000.00,
     64000.00,
     '2026-04-20'
 WHERE NOT EXISTS (
     SELECT 1 FROM investment
     WHERE portfolio_id = (SELECT portfolio_id FROM portfolio WHERE portfolio_name = 'Horizon Stability Portfolio')
-    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GOLDETF')
+    AND asset_id = (SELECT asset_id FROM asset WHERE ticker_symbol = 'GLD')
 );
+
+UPDATE investment
+SET purchase_price = CASE
+        WHEN purchase_price IS NULL OR purchase_price = 0 THEN amount_invested
+        ELSE purchase_price
+    END,
+    quantity = CASE
+        WHEN quantity IS NULL OR quantity = 0 THEN 1
+        ELSE quantity
+    END;
