@@ -17,11 +17,18 @@
 			<p id="portfolioDescription" class="portfolio-description">Loading description...</p>
 		</section>
 
-		<section class="card" aria-labelledby="investorHeading">
-			<h2 id="investorHeading">Investor Details</h2>
+		<section class="card investor-card" aria-labelledby="investorHeading">
+			<div class="card-header-row">
+				<h2 id="investorHeading">Investor &amp; Funds</h2>
+			</div>
 			<div id="investorDetails" class="investor-grid"></div>
-			<div class="section-actions">
-				<button id="buyBtn" class="primary-btn" type="button">Buy</button>
+
+			<div class="funds-panel">
+				<div class="funds-total">
+					<span class="funds-total-label">Total Funds Received</span>
+					<span id="totalFundsReceivedValue" class="funds-total-value">-</span>
+				</div>
+				<button id="addFundsBtn" class="primary-btn accent-btn" type="button">+ Add Funds</button>
 			</div>
 		</section>
 
@@ -39,10 +46,6 @@
 				<div class="summary-item">
 					<div class="summary-label">Mutual Funds</div>
 					<div id="mutualFundsValue" class="summary-value">-</div>
-				</div>
-				<div class="summary-item">
-					<div class="summary-label">Cash</div>
-					<div id="cashValue" class="summary-value">-</div>
 				</div>
 			</div>
 		</section>
@@ -75,7 +78,10 @@
 		</section>
 
 		<section class="card" aria-labelledby="investmentsHeading">
-			<h2 id="investmentsHeading">Investments</h2>
+			<div class="card-header-row">
+				<h2 id="investmentsHeading">Investments</h2>
+				<button id="buyBtn" class="primary-btn" type="button">+ Buy</button>
+			</div>
 			<div id="investmentsByType" class="investments-by-type"></div>
 			<p id="emptyState" class="empty-state" hidden>No investments in this portfolio.</p>
 		</section>
@@ -163,6 +169,37 @@
 				<button id="closeTransactionsModalBtn" class="icon-btn" type="button" aria-label="Close modal">&times;</button>
 			</div>
 			<div id="transactionsModalBody" class="modal-body"></div>
+		</div>
+	</div>
+
+	<div id="addFundsModal" class="modal" hidden>
+		<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="addFundsModalTitle">
+			<div class="modal-header">
+				<h3 id="addFundsModalTitle">Add Funds</h3>
+				<button id="closeAddFundsModalBtn" class="icon-btn" type="button" aria-label="Close modal">&times;</button>
+			</div>
+			<form id="addFundsForm" class="investment-form">
+				<label for="fundNameInput">Fund Name</label>
+				<input id="fundNameInput" type="text" required placeholder="e.g. Q1 Top-up">
+
+				<label for="fundAmountInput">Amount</label>
+				<input id="fundAmountInput" type="number" step="0.01" min="0.01" required>
+
+				<label for="fundDateInput">Received Date</label>
+				<input id="fundDateInput" type="date" required>
+
+				<label for="fundStatusInput">Status</label>
+				<select id="fundStatusInput" required>
+					<option value="Completed">Completed</option>
+					<option value="Pending">Pending</option>
+				</select>
+
+				<p id="addFundsMessage" class="form-message" aria-live="polite"></p>
+				<div class="form-actions">
+					<button id="submitAddFundsBtn" type="submit" class="primary-btn accent-btn">Add Funds</button>
+					<button id="cancelAddFundsBtn" type="button" class="secondary-btn">Cancel</button>
+				</div>
+			</form>
 		</div>
 	</div>
 
