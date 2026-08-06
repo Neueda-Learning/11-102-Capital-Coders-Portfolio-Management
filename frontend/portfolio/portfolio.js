@@ -7,6 +7,20 @@ const ASSET_TYPE_LABELS = {
 	'mutual funds': 'Mutual Funds',
 	cash: 'Cash'
 };
+function showToast(message, type = "success") {
+
+	const toast = document.getElementById("toast");
+
+	if (!toast) return;
+
+	toast.textContent = message;
+
+	toast.className = `toast show ${type}`;
+
+	setTimeout(() => {
+		toast.className = "toast";
+	}, 3000);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 	const pageTitle = document.getElementById('pageTitle');
@@ -306,8 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			closeTradeModal();
 			await Promise.all([loadInvestments(), loadPortfolioSummary()]);
+			showToast(mode === 'buy' ? 'Purchase successful!' : 'Sale successful!', 'success');
 		} catch (error) {
 			setTradeMessage(error instanceof Error ? error.message : `Unable to ${mode} investment.`, true);
+			showToast(mode === 'buy' ? 'Failed to buy investment.' : 'Failed to sell investment.', 'error');
 		} finally {
 			submitTradeBtn.disabled = false;
 		}
@@ -352,8 +368,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			closeAddFundsModal();
 			await Promise.all([loadInvestorFunds(), loadPortfolioSummary()]);
+			showToast('Funds added successfully!', 'success');
 		} catch (error) {
 			setAddFundsMessage(error instanceof Error ? error.message : 'Unable to add funds.', true);
+			showToast('Failed to add funds.', 'error');
 		} finally {
 			submitAddFundsBtn.disabled = false;
 		}
