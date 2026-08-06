@@ -485,8 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				<p><strong>Investment ID:</strong> ${escapeHtml(String(investment.investmentId))}</p>
 				<p><strong>Portfolio ID:</strong> ${escapeHtml(String(portfolioId))}</p>
 				<p><strong>Asset ID:</strong> ${escapeHtml(String(investment.assetId))}</p>
-				<p><strong>Ticker Symbol:</strong> ${escapeHtml(investment.tickerSymbol || '-')}</p>
-				<p><strong>Asset Type:</strong> ${escapeHtml(formatAssetTypeLabel(investment.assetType))}</p>
 				<p><strong>Amount Invested:</strong> ${formatCurrency(investment.amountInvested)}</p>
 				<p><strong>Current Value:</strong> ${formatCurrency(investment.currentValue)}</p>
 				<p><strong>Purchase Date:</strong> ${formatDate(investment.purchaseDate)}</p>

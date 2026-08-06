@@ -19,7 +19,13 @@ public interface FundRepository {
     Fund updateFund(Fund fund);
 
     void deleteFund(int fundId);
+<<<<<<< Updated upstream
 
+=======
+//
+//    // Optional: gives complete funding history of an investor
+//    List<Fund> getFundsByInvestorId(int investorId);
+>>>>>>> Stashed changes
 
     // Gives only total amount received by investor
     FundSummary getTotalFundsByInvestorId(int investorId);

@@ -1,6 +1,6 @@
 const params = new URLSearchParams(window.location.search);
-const empId = params.get("empid") || localStorage.getItem("empId") || "1";
-
+//const empId = params.get("empid") || localStorage.getItem("empId") || "1";
+const empId = params.get("employeeId") || localStorage.getItem("empId");
 const portfolioList = document.getElementById("portfolioList");
 const portfolioCount = document.getElementById("portfolioCount");
 const employeeIdDisplay = document.getElementById("employeeIdDisplay");
@@ -199,6 +199,13 @@ function renderPortfolios() {
 
             <div class="card-actions">
             <button
+                class="icon-btn view-btn"
+                data-id="${p.portfolioId}"
+                title="View Portfolio">
+                <i class="fa-solid fa-eye"></i>
+            </button>
+
+            <button
                 class="icon-btn edit-btn"
                 data-id="${p.portfolioId}"
                 title="Update">
@@ -212,6 +219,7 @@ function renderPortfolios() {
                 title="Delete">
                 <i class="fa-solid fa-trash"></i>
             </button>
+
 
             </div>
 
@@ -229,6 +237,7 @@ function renderPortfolios() {
                 <div>
 
                     <h4>${p.portfolioName}</h4>
+
 
                     <p>ID: ${p.portfolioId}</p>
 
@@ -250,6 +259,26 @@ function renderPortfolios() {
 
 
 
+     // VIEW BUTTON
+
+     document.querySelectorAll(".view-btn")
+     .forEach(btn=>{
+
+         btn.addEventListener("click",(e)=>{
+
+             e.stopPropagation();
+
+             const portfolioId = btn.dataset.id;
+
+
+//             window.location.href =
+//             `portfolio.html?portfolioId=${portfolioId}`;
+              window.location.href =
+              `../portfolio/portfolio.html?portfolioId=${portfolioId}`;
+
+         });
+
+     });
     // UPDATE BUTTON
 
     document.querySelectorAll(".edit-btn")
