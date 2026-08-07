@@ -135,7 +135,6 @@ Supported operations:
 * View investments
 * Buy new assets
 * Sell investments
-* Delete investments
 
 Each investment contains:
 
@@ -175,6 +174,7 @@ Portfolio-Management-System
 │   │   └── service
 │   │   └── repository
 │   │   └── model
+│   │   └── Exception
 │   │
 │   └── pom.xml
 │
@@ -223,14 +223,14 @@ Portfolio-Management-System
 ## APIs
 
 * Live News API
-* Financial Market Data APIs
+* Twelve data API to fetch live market data
 
 ## Tools
 
 * Git & GitHub
 * IntelliJ IDEA
 * VS Code
-* Postman
+* Swagger Documentation
 
 ---
 
